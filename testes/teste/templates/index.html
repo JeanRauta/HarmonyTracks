@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>separar faixas de audio</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style1.css') }}"> 
+</head>
+<body>
+    <header>
+        <div class="div-logo" class="teste">LOGO</div>
+    </header>
+    <main>
+    <div class="flex">
+        <h2 class="h2_tittle">Separe suas faixas musicais isolando vocais, instrumentos, batidas, linhas de baixo e <br>muito mais</h2>
+            <div id="file-input-container" ondragover="event.preventDefault()" ondrop="dropHandler(event)" ondragenter="dragEnterHandler(event)" ondragleave="dragLeaveHandler(event)">
+                <p>Escolha um arquivo de áudio ou arraste aqui</p>
+            <form action="/upload" method="POST" enctype="multipart/form-data">
+                <label class="input-file" for="file-input">Escolher arquivo</label>
+                <input type="file" style="display: none;" id="file-input" name="file" accept=".mp3,.wav,.flac" onchange="fileInputChangeHandler(event)">
+                <p class="suporte">Suporte: .mp3, .wav, .flac</p>
+                <div class="file-name"></div>
+                <button class="env-file" type="submit">Enviar Arquivo</button>
+            </form>
+            <p style="text-align: center; line-height: 30px;">Ou <br> cole o link de um vídeo do YouTube</p>
+            <form class="form-flex" action="/upload" method="POST">
+                <input class="url-input" type="text" name="url" placeholder="URL">
+                <button class="env-url" type="submit">Enviar</button>
+            </form>
+            </div>
+    </div>
+    </main>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
+
