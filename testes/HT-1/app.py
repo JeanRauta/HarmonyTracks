@@ -1,11 +1,11 @@
 import os
 import uuid
-import json
 from flask import Flask, render_template, request
 import demucs.api
 import torchaudio
 from pytube import YouTube
 from chord_extractor.extractors import Chordino
+from pydub import AudioSegment
 
 app = Flask(__name__)
 
@@ -31,11 +31,23 @@ def separar():
             download_path = audio_stream.download(output_path="./static/audio_test")
             base, ext = os.path.splitext(download_path)
             sanitized_base = base.replace(" ", "_")
-            audio_path = sanitized_base + ".mp3"
-            os.rename(download_path, audio_path)
+            
+            if ext.lower() == '.mp4':
+                audio = AudioSegment.from_file(download_path, format="mp4")
+                wav_path = f"{sanitized_base}.wav"
+                audio.export(wav_path, format="wav")
+                audio_path = wav_path
+                os.remove(download_path)  
+            else:
+                audio_path = download_path
+            
         else:
             return "Nenhum arquivo ou URL fornecido"
-
+        
+        unique_folder_name = str(uuid.uuid4())
+        output_folder = f"./static/{unique_folder_name}"
+        os.makedirs(output_folder)
+        
         separator = demucs.api.Separator(model="htdemucs_6s")
 
         origin, separated = separator.separate_audio_file(audio_path)
@@ -44,10 +56,6 @@ def separar():
         acordes = chordino.extract(audio_path)
         acordesC = [{'chord': acorde.chord, 'timestamp': acorde.timestamp} for acorde in acordes]
 
-        unique_folder_name = str(uuid.uuid4())
-        output_folder = f"./static/{unique_folder_name}"
-        os.makedirs(output_folder)
-        
         audio_tags = []
         for source_name, source_data in separated.items():
             sanitized_source_name = source_name.replace(" ", "_")

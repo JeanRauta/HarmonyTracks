@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='libs/waveform-playlist/styles/playlist.css') }}">
     <link rel="stylesheet" href="../static/libs/waveform-playlist/styles/playlist.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style/audios.css') }}">
+    <link rel="stylesheet" href="../static/style/audios.css">
 </head>
 <body>
     <header></header>
@@ -33,6 +34,8 @@
             { timestamp: {{ acorde.timestamp }}, chord: "{{ acorde.chord }}" },
             {% endfor %}
         ];
+
+        console.log(acordes)
     
         var playlist = WaveformPlaylist.init({
             container: document.getElementById("playlist"),
@@ -55,7 +58,7 @@
                 timeColor: 'grey',
                 fadeColor: 'black',
             },
-            isAutomaticScroll: true,
+            isAutomaticScroll: false,
             waveStyle: 'bars',
             seekStyle: "line",
             timescale: true,
@@ -69,6 +72,26 @@
                 name: "{{ audio_tag.name }}"
             },
             {% endfor %}
+            // {
+            //     src: "../static/audio_test/audio.mp3",
+            //     name: "tetse"
+            // },
+            // {
+            //     src: "../static/audio_test/audio.mp3",
+            //     name: "tetse"
+            // },
+            // {
+            //     src: "../static/audio_test/audio.mp3",
+            //     name: "tetse"
+            // },
+            // {
+            //     src: "../static/audio_test/audio.mp3",
+            //     name: "tetse"
+            // },
+            // {
+            //     src: "../static/audio_test/audio.mp3",
+            //     name: "tetse"
+            // },
             // {
             //     src: "../static/audio_test/audio.mp3",
             //     name: "tetse"
