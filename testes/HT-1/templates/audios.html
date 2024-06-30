@@ -25,7 +25,11 @@
             </button>
         </div>
     </div>
-    
+    <input type="range" id="master-volume" min="0" max="100" value="100" title="Volume">
+    <div id="seek-controls">
+        <input type="range" id="seek-range" min="0" max="100" step="0.1" value="0">
+    </div>
+
     <script src="{{ url_for('static', filename='libs/waveform-playlist/build/waveform-playlist.var.min.js') }}"></script>
     <script src="../static/libs/waveform-playlist/build/waveform-playlist.var.min.js"></script>
     <script>
@@ -35,7 +39,7 @@
             {% endfor %}
         ];
 
-        console.log(acordes)
+        console.log(acordes);
     
         var playlist = WaveformPlaylist.init({
             container: document.getElementById("playlist"),
@@ -58,7 +62,7 @@
                 timeColor: 'grey',
                 fadeColor: 'black',
             },
-            isAutomaticScroll: false,
+            isAutomaticScroll: true,
             waveStyle: 'bars',
             seekStyle: "line",
             timescale: true,
@@ -72,30 +76,6 @@
                 name: "{{ audio_tag.name }}"
             },
             {% endfor %}
-            // {
-            //     src: "../static/audio_test/audio.mp3",
-            //     name: "tetse"
-            // },
-            // {
-            //     src: "../static/audio_test/audio.mp3",
-            //     name: "tetse"
-            // },
-            // {
-            //     src: "../static/audio_test/audio.mp3",
-            //     name: "tetse"
-            // },
-            // {
-            //     src: "../static/audio_test/audio.mp3",
-            //     name: "tetse"
-            // },
-            // {
-            //     src: "../static/audio_test/audio.mp3",
-            //     name: "tetse"
-            // },
-            // {
-            //     src: "../static/audio_test/audio.mp3",
-            //     name: "tetse"
-            // },
         ]).then(function() {
             var ee = playlist.getEventEmitter();
 
@@ -115,48 +95,76 @@
                 inputRange.step = "100";
                 inputRange.style.width = '90px';
             });
-    
+
+            document.getElementById('seek-range').addEventListener('input', function(event) {
+                var seekPercentage = parseFloat(event.target.value);
+                var duration = getPlaylistDuration();
+                var seekTime = (seekPercentage / 100) * duration;
+                ee.emit("select", seekTime, seekTime);
+            });
+
+            ee.on('timeupdate', function(time) {
+                var duration = getPlaylistDuration();
+                var percentage = (time / duration) * 100;
+                document.getElementById('seek-range').value = percentage;
+            });
+
             ee.on('timeupdate', function(playbackPosition) {
                 updateChords(playbackPosition);
             });
-    
+
             document.getElementById("btn-play").addEventListener("click", function() {
                 ee.emit("play");
                 document.getElementById("btn-play").style.display = "none";
                 document.getElementById("btn-pause").style.display = "inline-block";
             });
-    
+
             document.getElementById("btn-pause").addEventListener("click", function() {
                 ee.emit("pause");
                 document.getElementById("btn-pause").style.display = "none";
                 document.getElementById("btn-play").style.display = "inline-block";
             });
-    
+
             ee.on('play', function() {
                 document.getElementById("btn-play").style.display = "none";
                 document.getElementById("btn-pause").style.display = "inline-block";
             });
-    
+
             ee.on('pause', function() {
                 document.getElementById("btn-pause").style.display = "none";
                 document.getElementById("btn-play").style.display = "inline-block";
             });
-    
+
             ee.on('finished', function() {
                 document.getElementById("btn-pause").style.display = "none";
                 document.getElementById("btn-play").style.display = "inline-block";
             });
-            var soloButton = document.querySelectorAll(".btn-solo");
-        var muteButton = document.querySelectorAll(".btn-mute");
 
-        for (let i = 0; i < soloButton.length; i++) {
+            var soloButton = document.querySelectorAll(".btn-solo");
+            var muteButton = document.querySelectorAll(".btn-mute");
+
+            for (let i = 0; i < soloButton.length; i++) {
                 soloButton[i].innerText = "S";
                 muteButton[i].innerText = "M";  
-                document.querySelectorAll('.time')[i].style.color = '#000'        
+                document.querySelectorAll('.time')[i].style.color = '#000';
+            }
+
+            document.getElementById("master-volume").addEventListener("input", function() {
+                var volume = parseInt(this.value);
+                ee.emit("mastervolumechange", volume);
+            });
+        });
+
+        function getPlaylistDuration() {
+            var duration = 0;
+            playlist.tracks.forEach(function(track) {
+                if (track.getEndTime() > duration) {
+                    duration = track.getEndTime();
+                }
+            });
+            return duration;
         }
 
-        });
-    
         function updateChords(playbackPosition) {
             var currentChord = "Sem acorde";
             var nextChord = "Sem acorde";
@@ -176,8 +184,6 @@
             document.getElementById("current-chord").innerText = "Acorde atual: " + currentChord;
             document.getElementById("next-chord").innerText = "Próximo acorde: " + nextChord;
         }
-        
     </script>
-    
 </body>
 </html>

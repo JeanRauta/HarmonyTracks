@@ -16,19 +16,19 @@ def index():
 @app.route('/separar', methods=['POST'])
 def separar():
     try:
-        if not os.path.exists("./static/audio_test"):
-            os.makedirs("./static/audio_test")
+        if not os.path.exists("./static/audio_base"):
+            os.makedirs("./static/audio_base")
 
         if 'file' in request.files and request.files['file'].filename != '':
             file = request.files['file']
             filename = file.filename.replace(" ", "_")
-            audio_path = os.path.join("./static/audio_test", filename)
+            audio_path = os.path.join("./static/audio_base", filename)
             file.save(audio_path)
         elif 'url' in request.form and request.form['url'] != '':
             youtube_url = request.form['url']
             yt = YouTube(youtube_url)
             audio_stream = yt.streams.filter(only_audio=True).first()
-            download_path = audio_stream.download(output_path="./static/audio_test")
+            download_path = audio_stream.download(output_path="./static/audio_base")
             base, ext = os.path.splitext(download_path)
             sanitized_base = base.replace(" ", "_")
             
