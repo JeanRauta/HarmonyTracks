@@ -1,0 +1,143 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    font-family: "Inter", sans-serif;
+}
+body {
+    background-color: #121212;
+    color: #FFFFFF;
+    height: 125vh;
+}
+header {
+    background-color: #121212;
+    height: 70px;
+}
+#playlist {
+    max-width: 1700px;
+    background-color: #121212;
+    margin: auto;
+}
+.playlist {
+    background-color: #121212;
+    max-width: 98%;
+    margin: auto;
+    transform: scale(90%);
+}
+.controlsdiv {
+    background-color: aliceblue;
+    position: fixed;
+    bottom: 10px;
+    width: 80px;
+    height: 40px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+}
+#controls {
+    margin: auto;
+    width: 20px;
+}
+#btn-play, #btn-pause {
+    background-color: transparent;
+    border: none;
+}
+#btn-play > i > img, #btn-pause > i > img {
+    width: 20px;
+    filter: brightness(0);
+}
+#current-chord, #next-chord {
+    margin: 20px auto;
+    max-width: 1700px;
+    background-color: #FFFFFF;
+    color: #000000;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 1.5em;
+}
+
+input[type="range"] {
+-webkit-appearance: none;
+appearance: none;
+background: transparent;
+cursor: pointer;
+width: 148px;
+margin-top: 10px;
+margin-bottom: 5px;
+}
+
+input[type="range"]:focus {
+outline: none;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+background-color: #e0e0e08f;
+border-radius: 0rem;
+height: .2rem;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+-webkit-appearance: none; 
+appearance: none;
+margin-top: -3.9999999999999996px; 
+background-color: #ffffff;
+border-radius: 0.5rem;
+height: 0.8rem;
+width: 0.8rem;
+}
+
+input[type="range"]::-moz-range-track {
+background-color: #e0e0e08f;
+border-radius: 0rem;
+height: .2rem;
+}
+
+input[type="range"]::-moz-range-thumb {
+background-color: #ffffff;
+border: none; 
+border-radius: 0.5rem;
+height: 0.8rem;
+width: 0.8rem;
+}
+
+input[type="range"]:focus::-moz-range-thumb{
+outline: 3px solid #ffffff;
+outline-offset: 0.125rem;
+}
+
+.stereopan-slider::after{
+margin-left: 10px;
+content: "R";
+font-weight: bolder;
+}
+
+.stereopan-slider::before{
+margin-right: 10px;
+content: "L";
+font-weight: bolder;
+}
+
+.stereopan-slider[type="range"]{
+margin: auto;
+}
+
+.stereopan-slider[type="range"]::-webkit-slider-runnable-track{
+height: .3rem;
+}
+
+.stereopan-slider.right-100::after {
+        color: #C3A364;
+}
+.stereopan-slider.left-100::before {
+color: #C3A364;
+}
+
+.playlist-tracks{
+background-color: #121212 !important;
+}
+
+.channel-wrapper{
+margin: 3px;
+}
