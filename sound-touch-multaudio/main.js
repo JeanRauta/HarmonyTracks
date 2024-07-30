@@ -3,7 +3,6 @@ const BUFFER_SIZE = 1024;
 class AudioPlayer {
     constructor({ emitter, pitch, tempo }) {
         this.emitter = emitter;
-
         this.context = new AudioContext();
         this.scriptProcessor = this.context.createScriptProcessor(BUFFER_SIZE, 2, 2);
         this.scriptProcessor.onaudioprocess = e => {
@@ -106,6 +105,8 @@ const pitchSlider = document.getElementById('pitchSlider');
 const seekSlider = document.getElementById('seekSlider');
 const currentTimeDisplay = document.getElementById('currentTime');
 const audioControlsContainer = document.getElementById('audioControls');
+const mark = document.querySelector('.mark');
+const multControler = document.querySelector('.multControler');
 
 let audioPlayers = [];
 let isPlaying = false;
@@ -128,8 +129,8 @@ async function loadAudioPlayers(urls) {
             emitter: {
                 emit: () => {},
             },
-            pitch: pitchSlider.value,
-            tempo: tempoSlider.value
+            pitch: Math.pow(2, pitchSlider.value / 12),
+            tempo: tempoSlider.value / 120
         });
 
         try {
@@ -162,16 +163,25 @@ async function loadAudioPlayers(urls) {
             audioControlsContainer.appendChild(volumeDiv);
 
         } catch (error) {
-            console.error(error);
+            console.error('Falha ao carregar o arquivo de áudio:', url, error);
         }
     }
 }
 
 function updateSeek(players, seekSlider) {
     if (players.length) {
-        console.log("seeking");
         const totalDuration = players.reduce((acc, player) => acc + player.durationVal, 0);
-        seekSlider.value = totalDuration / (players.length * 48000) / players[0].duration;
+        seekSlider.max = 100; // Ajusta o valor máximo para 100 para porcentagem
+        seekSlider.value = (totalDuration / (players.length * 48000) / players[0].duration) * 100;
+    }
+}
+
+function updateMarkPosition() {
+    if (audioPlayers.length) {
+        const percentage = seekSlider.value;
+        const containerWidth = multControler.clientWidth;
+        const markPosition = (percentage / 100) * containerWidth;
+        mark.style.left = `${markPosition}px`;
     }
 }
 
@@ -181,7 +191,8 @@ playButton.addEventListener('click', () => {
         isPlaying = true;
         myInterval.push(setInterval(() => {
             updateSeek(audioPlayers, seekSlider);
-        }, 1000));
+            updateMarkPosition();
+        }, 100));
     }
 });
 
@@ -196,27 +207,79 @@ pauseButton.addEventListener('click', () => {
 
 tempoSlider.addEventListener('input', () => {
     if (audioPlayers.length) {
+        const bpm = parseInt(tempoSlider.value, 10);
+        const defaultBPM = 120;
+        const tempoFactor = bpm / defaultBPM;
         audioPlayers.forEach(player => {
-            player.tempo = tempoSlider.value;
+            player.tempo = tempoFactor;
         });
     }
 });
 
 pitchSlider.addEventListener('input', () => {
     if (audioPlayers.length) {
+        const semitones = parseInt(pitchSlider.value, 10);
+        const pitchFactor = Math.pow(2, semitones / 12);
         audioPlayers.forEach(player => {
-            player.pitch = pitchSlider.value;
+            player.pitch = pitchFactor;
         });
     }
 });
 
 seekSlider.addEventListener('input', () => {
-    let percentage = seekSlider.value * 100;
+    let percentage = seekSlider.value;
+    if (audioPlayers.length) {
+        audioPlayers.forEach(player => {
+            player.seekPercent(percentage);
+        });
+        updateMarkPosition();
+    }
+});
+
+multControler.addEventListener('click', (e) => {
+    const containerWidth = multControler.clientWidth;
+    const offsetX = e.clientX - multControler.getBoundingClientRect().left;
+    const percentage = Math.min(Math.max(0, (offsetX / containerWidth) * 100), 100);
+    seekSlider.value = percentage;
+    updateMarkPosition();
+
     if (audioPlayers.length) {
         audioPlayers.forEach(player => {
             player.seekPercent(percentage);
         });
     }
 });
+
+// Arrastar o "mark"
+let isDragging = false;
+
+mark.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+});
+
+function onMouseMove(e) {
+    if (isDragging) {
+        const containerRect = multControler.getBoundingClientRect();
+        const markX = e.clientX - containerRect.left;
+        const containerWidth = containerRect.width;
+        const percentage = Math.min(Math.max(0, (markX / containerWidth) * 100), 100);
+        seekSlider.value = percentage;
+        updateMarkPosition();
+
+        if (audioPlayers.length) {
+            audioPlayers.forEach(player => {
+                player.seekPercent(percentage);
+            });
+        }
+    }
+}
+
+function onMouseUp() {
+    isDragging = false;
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+}
 
 loadAudioPlayers(audioUrls);
