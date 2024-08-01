@@ -120,8 +120,7 @@ const audioUrls = [
     './other.wav'
 ];
 
-const playButton = document.getElementById('playButton');
-const pauseButton = document.getElementById('pauseButton');
+const playPauseButton = document.getElementById('playPauseButton');
 const tempoSlider = document.getElementById('tempoSlider');
 const pitchSlider = document.getElementById('pitchSlider');
 const seekSlider = document.getElementById('seekSlider');
@@ -137,6 +136,10 @@ const contentElement = document.getElementById('content');
 let audioPlayers = [];
 let isPlaying = false;
 let myInterval = [];
+
+// Inicializa o seekSlider e mark
+seekSlider.value = 0;
+mark.style.left = '0px';
 
 masterVolumeSlider.addEventListener('input', (e) => {
     masterVolumeNode.gain.value = e.target.value;
@@ -251,24 +254,24 @@ function updateMarkPosition() {
     }
 }
 
-playButton.addEventListener('click', () => {
-    if (audioPlayers.length && !isPlaying) {
-        audioPlayers.forEach(player => player.play());
-        isPlaying = true;
-        myInterval.push(setInterval(() => {
-            updateSeek(audioPlayers, seekSlider);
-            updateCurrentTime(audioPlayers); // Atualiza o tempo atual de reprodução
-            updateMarkPosition();
-        }, 100));
-    }
-});
-
-pauseButton.addEventListener('click', () => {
-    if (audioPlayers.length && isPlaying) {
-        audioPlayers.forEach(player => player.pause());
-        isPlaying = false;
-        clearInterval(myInterval[0]);
-        myInterval = [];
+playPauseButton.addEventListener('click', () => {
+    if (audioPlayers.length) {
+        if (isPlaying) {
+            audioPlayers.forEach(player => player.pause());
+            isPlaying = false;
+            playPauseButton.textContent = 'Play';
+            clearInterval(myInterval[0]);
+            myInterval = [];
+        } else {
+            audioPlayers.forEach(player => player.play());
+            isPlaying = true;
+            playPauseButton.textContent = 'Pause';
+            myInterval.push(setInterval(() => {
+                updateSeek(audioPlayers, seekSlider);
+                updateCurrentTime(audioPlayers); // Atualiza o tempo atual de reprodução
+                updateMarkPosition();
+            }, 100));
+        }
     }
 });
 
