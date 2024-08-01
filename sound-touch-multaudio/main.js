@@ -101,10 +101,10 @@ class AudioPlayer {
 
 
 const audioUrls = [
-    './vocals.wav',
-    './bass.wav',
-    './drums.wav',
-    './other.wav'
+    './audio/vocals.wav',
+    './audio/bass.wav',
+    './audio/drums.wav',
+    './audio/other.wav'
 ];
 
 const playButton = document.getElementById('playButton');
