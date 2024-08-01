@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reprodutor de Áudio</title>
-  <script src="soundtouch.js" defer></script>
-  <script src="main.js" defer></script>  
+  <script src="./soundtouch.js" defer></script>
+  <script src="./main.js" defer></script>
   <style>
     .audio-container {
       margin-bottom: 20px;
@@ -26,32 +26,48 @@
       cursor: grab;
       transition: left 0.1s linear; /* Suaviza o movimento do mark */
     }
+
+    /* Estilos para o carregamento */
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f0f0f0;
+      font-size: 1.5rem;
+    }
+
+    .content {
+      display: none; /* Oculta o conteúdo até que o carregamento esteja completo */
+    }
   </style>
 </head>
 <body>
-  <button id="playButton">Play</button>
-  <button id="pauseButton">Pause</button>
+  <div id="loading" class="loading">Carregando...</div>
+  <div id="content" class="content">
+    <button id="playButton">Play</button>
+    <button id="pauseButton">Pause</button>
 
-  <label for="tempoSlider">Tempo (BPM):</label>
-  <input type="range" id="tempoSlider" min="60" max="180" step="1" value="120">
+    <label for="tempoSlider">Tempo (BPM):</label>
+    <input type="range" id="tempoSlider" min="60" max="180" step="1" value="120">
 
-  <label for="pitchSlider">Pitch (semitons):</label>
-  <input type="range" id="pitchSlider" min="-12" max="12" step="1" value="0">
+    <label for="pitchSlider">Pitch (semitons):</label>
+    <input type="range" id="pitchSlider" min="-12" max="12" step="1" value="0">
 
-  <br>
-  <label for="seekSlider">Seek:</label>
-  <input type="range" id="seekSlider" min="0" max="1" value="0" step="0.01">
-  <div id="currentTime">0:00</div>
+    <br>
+    <label for="seekSlider">Seek:</label>
+    <input type="range" id="seekSlider" min="0" max="1" value="0" step="0.01">
+    <div id="currentTime">0:00</div>
 
-  <label for="masterVolumeSlider">Volume Master:</label>
-  <input type="range" id="masterVolumeSlider" min="0" max="1" step="0.01" value="0.5">
-  <span id="masterVolumePercentage">50%</span>
+    <div id="audioControls" aria-live="polite"></div>
 
-  <div id="audioControls" aria-live="polite"></div>
+    <div class="multControler">
+        <div class="mark" role="slider" aria-label="Mark"></div>
+    </div>
 
-  <div class="multControler">
-      <div class="mark" role="slider" aria-label="Mark"></div>
+    <label for="masterVolumeSlider">Master Volume:</label>
+    <input type="range" id="masterVolumeSlider" min="0" max="1" step="0.01" value="1">
+    <span id="masterVolumePercentage">100%</span>
   </div>
-
 </body>
 </html>

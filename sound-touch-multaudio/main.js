@@ -1,7 +1,7 @@
 const BUFFER_SIZE = 1024;
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 const masterVolumeNode = audioContext.createGain();
-masterVolumeNode.gain.value = 0.5;
+masterVolumeNode.gain.value = 1; // Define o volume master inicial para 100%
 
 class AudioPlayer {
     constructor({ emitter, pitch, tempo }) {
@@ -27,10 +27,13 @@ class AudioPlayer {
 
         this.duration = undefined;
         this.volumeNode = this.context.createGain();
-        this.volumeNode.gain.value = 0.5;
+        this.volumeNode.gain.value = 1; // Define o volume inicial para 100%
 
-        this.volumeNode.connect(masterVolumeNode);
-        masterVolumeNode.connect(this.context.destination);
+        this.volumeNode.connect(masterVolumeNode); // Conecta o volume individual ao volume master
+        masterVolumeNode.connect(this.context.destination); // Conecta o volume master ao destino do contexto de áudio
+
+        this.isMuted = false;
+        this.savedVolume = this.volumeNode.gain.value;
     }
 
     get pitch() {
@@ -93,20 +96,29 @@ class AudioPlayer {
             );
         }
     }
+
+    mute() {
+        if (!this.isMuted) {
+            this.savedVolume = this.volumeNode.gain.value;
+            this.volumeNode.gain.value = 0;
+            this.isMuted = true;
+        }
+    }
+
+    unmute() {
+        if (this.isMuted) {
+            this.volumeNode.gain.value = this.savedVolume;
+            this.isMuted = false;
+        }
+    }
 }
 
-
-
-
-
-
 const audioUrls = [
-    './audio/vocals.wav',
-    './audio/bass.wav',
-    './audio/drums.wav',
-    './audio/other.wav'
+    './vocals.wav',
+    './bass.wav',
+    './drums.wav',
+    './other.wav'
 ];
-
 
 const playButton = document.getElementById('playButton');
 const pauseButton = document.getElementById('pauseButton');
@@ -119,6 +131,8 @@ const masterVolumePercentage = document.getElementById('masterVolumePercentage')
 const audioControlsContainer = document.getElementById('audioControls');
 const mark = document.querySelector('.mark');
 const multControler = document.querySelector('.multControler');
+const loadingElement = document.getElementById('loading');
+const contentElement = document.getElementById('content');
 
 let audioPlayers = [];
 let isPlaying = false;
@@ -141,7 +155,7 @@ async function loadAudioPlayers(urls) {
     audioPlayers = [];
     audioControlsContainer.innerHTML = ''; 
 
-    for (const [index, url] of urls.entries()) {
+    const loadPromises = urls.map(async (url, index) => {
         const audioPlayer = new AudioPlayer({
             emitter: {
                 emit: () => {},
@@ -168,43 +182,63 @@ async function loadAudioPlayers(urls) {
             volumeSlider.min = '0';
             volumeSlider.max = '1';
             volumeSlider.step = '0.01';
-            volumeSlider.value = '0.5';
+            volumeSlider.value = '1'; // Define o volume inicial para 100%
 
             const volumePercentage = document.createElement('span');
             volumePercentage.id = `volumePercentage${index}`;
-            volumePercentage.textContent = '50%';
+            volumePercentage.textContent = '100%'; // Volume inicial em porcentagem
 
             volumeSlider.addEventListener('input', (e) => {
-                audioPlayer.volumeNode.gain.value = e.target.value;
-                volumePercentage.textContent = `${Math.round(e.target.value * 100)}%`;
+                const volume = e.target.value;
+                volumePercentage.textContent = `${Math.round(volume * 100)}%`;
+                audioPlayer.volumeNode.gain.value = volume;
+            });
+
+            const muteCheckbox = document.createElement('input');
+            muteCheckbox.type = 'checkbox';
+            muteCheckbox.id = `muteCheckbox${index}`;
+
+            muteCheckbox.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    audioPlayer.mute();
+                    volumeSlider.disabled = true;
+                } else {
+                    audioPlayer.unmute();
+                    volumeSlider.disabled = false;
+                }
             });
 
             const volumeDiv = document.createElement('div');
             volumeDiv.appendChild(volumeLabel);
             volumeDiv.appendChild(volumeSlider);
             volumeDiv.appendChild(volumePercentage);
+            volumeDiv.appendChild(muteCheckbox);
             audioControlsContainer.appendChild(volumeDiv);
 
         } catch (error) {
             console.error('Falha ao carregar o arquivo de áudio:', url, error);
         }
-    }
+    });
+
+    await Promise.all(loadPromises);
+
+    // Oculta o elemento de carregamento e mostra o conteúdo
+    loadingElement.style.display = 'none';
+    contentElement.style.display = 'block';
 }
 
 function updateSeek(players, seekSlider) {
     if (players.length) {
         const totalDuration = players.reduce((acc, player) => acc + player.durationVal, 0);
-        seekSlider.max = 100;
+        seekSlider.max = 100; // Ajusta o valor máximo para 100 para porcentagem
         seekSlider.value = (totalDuration / (players.length * 48000) / players[0].duration) * 100;
     }
 }
 
 function updateCurrentTime(players) {
     if (players.length) {
-        const currentTime = players[0].durationVal / players[0].context.sampleRate;
-        const minutes = Math.floor(currentTime / 60);
-        const seconds = Math.floor(currentTime % 60).toString().padStart(2, '0');
-        currentTimeDisplay.textContent = `${minutes}:${seconds}`;
+        const totalTime = players.reduce((acc, player) => acc + player.durationVal, 0);
+        currentTimeDisplay.textContent = `${Math.floor(totalTime / 60)}:${Math.floor(totalTime % 60).toString().padStart(2, '0')}`;
     }
 }
 
@@ -223,7 +257,7 @@ playButton.addEventListener('click', () => {
         isPlaying = true;
         myInterval.push(setInterval(() => {
             updateSeek(audioPlayers, seekSlider);
-            updateCurrentTime(audioPlayers);
+            updateCurrentTime(audioPlayers); // Atualiza o tempo atual de reprodução
             updateMarkPosition();
         }, 100));
     }
@@ -283,6 +317,7 @@ multControler.addEventListener('click', (e) => {
     }
 });
 
+// Arrastar o "mark"
 let isDragging = false;
 
 mark.addEventListener('mousedown', (e) => {
