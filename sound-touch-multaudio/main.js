@@ -1,9 +1,12 @@
 const BUFFER_SIZE = 1024;
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+const masterVolumeNode = audioContext.createGain();
+masterVolumeNode.gain.value = 0.5;
 
 class AudioPlayer {
     constructor({ emitter, pitch, tempo }) {
         this.emitter = emitter;
-        this.context = new AudioContext();
+        this.context = audioContext;
         this.scriptProcessor = this.context.createScriptProcessor(BUFFER_SIZE, 2, 2);
         this.scriptProcessor.onaudioprocess = e => {
             const l = e.outputBuffer.getChannelData(0);
@@ -25,6 +28,9 @@ class AudioPlayer {
         this.duration = undefined;
         this.volumeNode = this.context.createGain();
         this.volumeNode.gain.value = 0.5;
+
+        this.volumeNode.connect(masterVolumeNode);
+        masterVolumeNode.connect(this.context.destination);
     }
 
     get pitch() {
@@ -70,12 +76,10 @@ class AudioPlayer {
 
     play() {
         this.scriptProcessor.connect(this.volumeNode);
-        this.volumeNode.connect(this.context.destination);
     }
 
     pause() {
         this.scriptProcessor.disconnect(this.volumeNode);
-        this.volumeNode.disconnect(this.context.destination);
     }
 
     get durationVal() {
@@ -91,6 +95,11 @@ class AudioPlayer {
     }
 }
 
+
+
+
+
+
 const audioUrls = [
     './vocals.wav',
     './bass.wav',
@@ -104,6 +113,8 @@ const tempoSlider = document.getElementById('tempoSlider');
 const pitchSlider = document.getElementById('pitchSlider');
 const seekSlider = document.getElementById('seekSlider');
 const currentTimeDisplay = document.getElementById('currentTime');
+const masterVolumeSlider = document.getElementById('masterVolumeSlider');
+const masterVolumePercentage = document.getElementById('masterVolumePercentage');
 const audioControlsContainer = document.getElementById('audioControls');
 const mark = document.querySelector('.mark');
 const multControler = document.querySelector('.multControler');
@@ -111,6 +122,11 @@ const multControler = document.querySelector('.multControler');
 let audioPlayers = [];
 let isPlaying = false;
 let myInterval = [];
+
+masterVolumeSlider.addEventListener('input', (e) => {
+    masterVolumeNode.gain.value = e.target.value;
+    masterVolumePercentage.textContent = `${Math.round(e.target.value * 100)}%`;
+});
 
 async function loadAudioPlayers(urls) {
     if (isPlaying) {
@@ -153,13 +169,19 @@ async function loadAudioPlayers(urls) {
             volumeSlider.step = '0.01';
             volumeSlider.value = '0.5';
 
+            const volumePercentage = document.createElement('span');
+            volumePercentage.id = `volumePercentage${index}`;
+            volumePercentage.textContent = '50%';
+
             volumeSlider.addEventListener('input', (e) => {
                 audioPlayer.volumeNode.gain.value = e.target.value;
+                volumePercentage.textContent = `${Math.round(e.target.value * 100)}%`;
             });
 
             const volumeDiv = document.createElement('div');
             volumeDiv.appendChild(volumeLabel);
             volumeDiv.appendChild(volumeSlider);
+            volumeDiv.appendChild(volumePercentage);
             audioControlsContainer.appendChild(volumeDiv);
 
         } catch (error) {
@@ -171,8 +193,17 @@ async function loadAudioPlayers(urls) {
 function updateSeek(players, seekSlider) {
     if (players.length) {
         const totalDuration = players.reduce((acc, player) => acc + player.durationVal, 0);
-        seekSlider.max = 100; // Ajusta o valor máximo para 100 para porcentagem
+        seekSlider.max = 100;
         seekSlider.value = (totalDuration / (players.length * 48000) / players[0].duration) * 100;
+    }
+}
+
+function updateCurrentTime(players) {
+    if (players.length) {
+        const currentTime = players[0].durationVal / players[0].context.sampleRate;
+        const minutes = Math.floor(currentTime / 60);
+        const seconds = Math.floor(currentTime % 60).toString().padStart(2, '0');
+        currentTimeDisplay.textContent = `${minutes}:${seconds}`;
     }
 }
 
@@ -191,6 +222,7 @@ playButton.addEventListener('click', () => {
         isPlaying = true;
         myInterval.push(setInterval(() => {
             updateSeek(audioPlayers, seekSlider);
+            updateCurrentTime(audioPlayers);
             updateMarkPosition();
         }, 100));
     }
@@ -250,7 +282,6 @@ multControler.addEventListener('click', (e) => {
     }
 });
 
-// Arrastar o "mark"
 let isDragging = false;
 
 mark.addEventListener('mousedown', (e) => {
