@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Faixas separadas</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='libs/waveform-playlist/styles/playlist.css') }}">
-    <link rel="stylesheet" href="../static/libs/waveform-playlist/styles/playlist.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style/icons.css') }}">
-    <link rel="stylesheet" href="../static/style/icons.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
@@ -18,6 +16,7 @@
         }
         body {
             background-color: #121212;
+            height: 2000px;
         }
         header {
             display: flex;
@@ -121,6 +120,16 @@
         .channel-progress{
             background-color: #C3A364 !important;
         }
+        .chord-image {
+            max-width: 100%;
+            height: auto;
+        }
+        #chord-image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -137,6 +146,9 @@
     </main>
     <div id="current-chord">Acorde atual: </div>
     <div id="next-chord">Próximo acorde: </div>
+    <div id="chord-image-container">
+        <img id="chord-image" class="chord-image" src="" alt="Imagem do acorde atual">
+    </div>
 
     <div class="controls">
         <div>
@@ -151,7 +163,6 @@
     </div>
 
     <script src="{{ url_for('static', filename='libs/waveform-playlist/build/waveform-playlist.var.min.js') }}"></script>
-    <script src="../static/libs/waveform-playlist/build/waveform-playlist.var.min.js"></script>
     <script>
         function goBackAndClose() {
             window.history.back();
@@ -188,12 +199,6 @@
                 name: "{{ audio_tag.name }}"
             },
             {% endfor %}
-            // { src: "../static/audio_base/teste.wav", name: "teste 1" },
-            // { src: "../static/audio_base/teste.wav", name: "teste 2" },
-            // { src: "../static/audio_base/teste.wav", name: "teste 3" },
-            // { src: "../static/audio_base/teste.wav", name: "teste 1" },
-            // { src: "../static/audio_base/teste.wav", name: "teste 2" },
-            // { src: "../static/audio_base/teste.wav", name: "teste 3" },
         ]).then(function() {
             var ee = playlist.getEventEmitter();
 
@@ -206,8 +211,7 @@
             document.getElementById('custom-pause').addEventListener('click', function() {
                 ee.emit("pause");
             });
-//+++++++++++++++++++++++++++++++++++++++++++++++++
-            
+
             ee.on('timeupdate', function(playbackPosition) {
                 updateChords(playbackPosition);
             });
@@ -232,9 +236,16 @@
                 
                 document.getElementById("current-chord").innerText = "Acorde atual: " + currentChord;
                 document.getElementById("next-chord").innerText = "Próximo acorde: " + nextChord;
+                updateChordImage(currentChord);
             }
 
-//+++++++++++++++++++++++++++++++++++++++++++++++++
+            function updateChordImage(currentChord) {
+                var chordName = currentChord.split('/')[0].trim();
+                var chordImage = document.getElementById('chord-image');
+                chordImage.src = "{{ url_for('static', filename='img/chords/') }}" + chordName + ".png";
+                chordImage.alt = "Imagem do acorde " + chordName;
+            }
+
             seekRange.addEventListener('input', function(event) {
                 var seekPercentage = parseFloat(event.target.value);
                 var duration = getPlaylistDuration();
@@ -261,7 +272,7 @@
             playlist.tracks.forEach(function(track, index) {
                 var trackControls = document.createElement('div');
                 trackControls.className = 'track-controls';
-                let ordem = ["bateria", "baixo", "outros", "vocal", "guitar", "piano"]
+                let ordem = ["bateria", "baixo", "outros", "vocal", "guitar", "piano"];
                 trackControls.innerHTML = `
                     <div class="headControls">
                         <div style="color: #C3A364;">${ordem[index]}</div>
@@ -311,13 +322,8 @@
                 ee.emit('mastervolumechange', volume);
             });
 
-            var autoCheckbox = document.getElementById('auto');
-            autoCheckbox.addEventListener('change', function() {
-                if (this.checked) {
-                    ee.emit("automaticscroll", true);
-                } else {
-                    ee.emit("automaticscroll", false);
-                }
+            document.getElementById('auto').addEventListener('change', function() {
+                ee.emit("automaticscroll", this.checked);
             });
         });
     </script>
