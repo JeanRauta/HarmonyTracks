@@ -1,0 +1,202 @@
+teste de processamento-------------- 15/09/24
+
+
+D6 + CPU+++++++++++++++++++++++++++++++
+
+TESTE 01:
+
+ tempo da música testada: 04:00,
+ quantidade de áudios: 1,
+ modelo utilizado: htdemucs_6s,
+ jobs: 4,
+ device: cpu (i5-10300H, núcleos: 4, threads: 8, Frequência: 2.50Ghz)
+
+ RESULTADO: 01:58
+
+=======================================
+
+
+TESTE 02:
+
+ tempo da música testada: 04:00,
+ quantidade de áudios: 2,
+ modelo utilizado: htdemucs_6s,
+ jobs: 4,
+ device: cpu (i5-10300H, núcleos: 4, threads: 8, Frequência: 2.50Ghz)
+
+ RESULTADO: morto
+
+=======================================
+
+
+TESTE 03:
+
+ tempo da música testada: 04:00,
+ quantidade de áudios: 2,
+ modelo utilizado: htdemucs_6s,
+ jobs: 2,
+ device: cpu (i5-10300H, núcleos: 4, threads: 8, Frequência: 2.50Ghz)
+
+ RESULTADO: 07:53
+
+=======================================
+
+
+TESTE 04:
+
+ tempo da música testada: 04:00,
+ quantidade de áudios: 3,
+ modelo utilizado: htdemucs_6s,
+ jobs: 1,
+ device: cpu (i5-10300H, núcleos: 4, threads: 8, Frequência: 2.50Ghz)
+
+ RESULTADO: morto
+
+=======================================
+D4 + CPU+++++++++++++++++++++++++++++++
+
+ 
+TESTE 05:
+
+ tempo da música testada: 04:00,
+ quantidade de áudios: 1,
+ modelo utilizado: htdemucs_ft,
+ jobs: 4,
+ device: cpu (i5-10300H, núcleos: 4, threads: 8, Frequência: 2.50Ghz)
+
+ RESULTADO: 08:51
+
+=======================================
+
+
+TESTE 06:
+
+ tempo da música testada: 04:00,
+ quantidade de áudios: 1,
+ modelo utilizado: htdemucs_ft,
+ jobs: 6,
+ device: cpu (i5-10300H, núcleos: 4, threads: 8, Frequência: 2.50Ghz)
+
+ RESULTADO: morto
+
+=======================================
+
+
+TESTE 07:
+
+ tempo da música testada: 04:00,
+ quantidade de áudios: 2,
+ modelo utilizado: htdemucs_ft,
+ jobs: 1,
+ device: cpu (i5-10300H, núcleos: 4, threads: 8, Frequência: 2.50Ghz)
+
+ RESULTADO: morto
+
+=======================================
+D6 + GPU ++++++++++++++++++++++++++++++
+
+
+TESTE 08:
+
+ tempo da música testada: 04:00,
+ quantidade de áudios: 1,
+ modelo utilizado: htdemucs_6s,
+ jobs: 8,
+ device: cuda (NVIDIA GTX 1650 mobile, 4GBVRAM)
+
+ RESULTADO: 00:15
+
+=======================================
+
+
+TESTE 09:
+
+ tempo da música testada: 04:00,
+ quantidade de áudios: 2,
+ modelo utilizado: htdemucs_6s,
+ jobs: 1,
+ device: cuda (NVIDIA GTX 1650 mobile, 4GBVRAM)
+
+ RESULTADO: 00:31
+
+=======================================
+
+
+TESTE 10: variado
+
+ tempo da música testada: 04:00,
+ quantidade de áudios: 2,
+ modelo utilizado: htdemucs_6s,
+ jobs: 6,
+ device: cuda (NVIDIA GTX 1650 mobile, 4GBVRAM)
+
+ RESULTADO: 00:30
+
+=======================================
+
+
+TESTE 11:
+
+ tempo da música testada: 04:00,
+ quantidade de áudios: 2,
+ modelo utilizado: htdemucs_6s,
+ jobs: 1,
+ device: cuda (NVIDIA GTX 1650 mobile, 4GBVRAM)
+
+ RESULTADO: 00:27
+
+=======================================
+D4 + GPU ++++++++++++++++++++++++++++++
+
+
+TESTE 12:
+
+ tempo da música testada: 04:00,
+ quantidade de áudios: 1,
+ modelo utilizado: htdemucs_ft,
+ jobs: 8,
+ device: cuda (NVIDIA GTX 1650 mobile, 4GBVRAM)
+
+ RESULTADO: 01:06
+
+=======================================
+
+
+TESTE 13:
+
+ tempo da música testada: 04:00,
+ quantidade de áudios: 2,
+ modelo utilizado: htdemucs_ft,
+ jobs: 1,
+ device: cuda (NVIDIA GTX 1650 mobile, 4GBVRAM)
+
+ RESULTADO: morto
+
+=======================================
+D + GPU ++++++++++++++++++++++++++++++
+
+
+TESTE 14:
+
+ tempo da música testada: 04:00,
+ quantidade de áudios: 1,
+ modelo utilizado: htdemucs,
+ jobs: 8,
+ device: cuda (NVIDIA GTX 1650 mobile, 4GBVRAM)
+
+ RESULTADO: 00:15
+
+=======================================
+
+
+TESTE 15:
+
+ tempo da música testada: 04:00,
+ quantidade de áudios: 2,
+ modelo utilizado: htdemucs,
+ jobs: 1,
+ device: cuda (NVIDIA GTX 1650 mobile, 4GBVRAM)
+
+ RESULTADO: morto
+
+=======================================

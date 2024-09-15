@@ -1,0 +1,50 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+        }
+        body{
+            background-color: #121212;
+        }
+        .teclado{
+            width: min-content;
+            margin: auto;
+            scale: 180%;
+            height: 34vh;
+            display: flex;
+        }
+        .note , .active{
+            fill: #C3A364 !important;
+        }
+
+        .audio{
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: white;
+        }
+
+    </style>
+</head>
+<body>
+    <midi-visualizer
+        type="waterfall"
+        src="output.mid" class="teclado">
+    </midi-visualizer>
+ 
+    <midi-player
+        src="output.mid" class="audio"
+        sound-font visualizer="midi-visualizer">
+    </midi-player>
+    <script src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.23.1/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.4.0"></script>
+</body>
+</html>
+
+

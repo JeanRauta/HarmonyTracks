@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Separation</title>
+    <script defer src="script.js"></script>
+</head>
+<body>
+    <h1>Audio Separation</h1>
+    <form id="audioForm">
+        <div>
+            <label for="file">Upload File:</label>
+            <input type="file" id="file" name="file">
+        </div>
+        <div>
+            <label for="url">YouTube URL:</label>
+            <input type="text" id="url" name="url">
+        </div>
+        <div>
+            <label for="model">Model:</label>
+            <select id="model" name="model">
+                <option value="d2">d2</option>
+                <option value="d4">d4</option>
+                <option value="d6">d6</option>
+            </select>
+        </div>
+        <button type="button" id="submitBtn">Enviar</button>
+        <button type="button" id="showAudioBtn" disabled>Ver Áudios</button>
+    </form>
+    <div id="result">
+        <h2>Faixas Processadas:</h2>
+        <ul id="audioList"></ul>
+    </div>
+
+    <script>
+
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('audioForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const showAudioBtn = document.getElementById('showAudioBtn');
+    const audioList = document.getElementById('audioList');
+    let audioTags = [];  
+
+    submitBtn.addEventListener('click', async function (event) {
+        event.preventDefault();
+
+        const formData = new FormData();
+        const fileInput = document.getElementById('file');
+        const urlInput = document.getElementById('url');
+        const modelSelect = document.getElementById('model');
+
+        if (fileInput.files.length > 0) {
+            formData.append('file', fileInput.files[0]);
+        }
+
+        if (urlInput.value) {
+            formData.append('url', urlInput.value);
+        }
+
+        formData.append('model', modelSelect.value);
+
+        try {
+            const response = await fetch('http://127.0.0.1:5000/separar', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const data = await response.json();
+            audioTags = data.audio_tags;  
+            alert('Áudio processado com sucesso! Clique em "Ver Áudios" para escutá-los.');
+
+            showAudioBtn.disabled = false;
+
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Ocorreu um erro ao processar o áudio.');
+        }
+    });
+
+    showAudioBtn.addEventListener('click', function () {
+        audioList.innerHTML = '';
+
+        audioTags.forEach(tag => {
+            const li = document.createElement('li');
+            
+            const audio = document.createElement('audio');
+            audio.controls = true;
+            audio.src = `http://127.0.0.1:5000/download?file_id=${tag.file_id}`;
+            audio.type = 'audio/wav';
+            
+            const label = document.createElement('span');
+            label.textContent = `${tag.name}`;
+            
+            li.appendChild(label);
+            li.appendChild(audio);
+            audioList.appendChild(li);
+        });
+    });
+});
+
+    </script>
+</body>
+</html>

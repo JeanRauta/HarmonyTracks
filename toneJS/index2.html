@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Audio Playlist with Tone.js</title>
+  <link rel="stylesheet" href="waveform-playlist/styles/playlist.css">
+  <script src="https://unpkg.com/tone@15.0.4/build/Tone.js"></script>
+  <script src="waveform-playlist/build/waveform-playlist.var.min.js"></script>
+  <style>
+    .visualizer { width: 100%; height: 200px; }
+    .controls { margin: 10px 0; }
+  </style>
+</head>
+<body>
+  <button id="play-btn">Play</button>
+  <button id="stop-btn">Stop</button>
+  <div id="playlist"></div>
+  <canvas class="visualizer" width="800" height="200"></canvas>
+
+  <div class="controls">
+    <label for="pitch">Pitch Shift (semitones):</label>
+    <input type="range" id="pitch" min="-24" max="24" step="1" value="0">
+    <span id="pitch-value">0</span>
+  </div>
+
+  <script>
+    var toneCtx = Tone.getContext();
+    var audioCtx = toneCtx.rawContext;
+    var analyser = audioCtx.createAnalyser();
+    var offlineSetup = [];
+    var pitchShift;
+
+    // Inicializa o playlist
+    playlist = WaveformPlaylist.init({
+      ac: audioCtx,
+      barWidth: 3,
+      barGap: 1,
+      container: document.getElementById("playlist"),
+      colors: { waveOutlineColor: '#005BBB' },
+      controls: { show: true, width: 200 },
+      zoomLevels: [500, 1000, 3000, 5000],
+      samplesPerPixel: 1000,
+      waveHeight: 100,
+      isAutomaticScroll: true,
+      timescale: true,
+      state: "cursor",
+      effects: function(masterGainNode, destination, isOffline) {
+        if (!isOffline) masterGainNode.connect(analyser);
+        masterGainNode.connect(destination);
+      }
+    });
+
+    playlist.initExporter();
+
+    playlist.ee.on("audiorenderingstarting", function(offlineCtx, setup) {
+      const offlineContext = new Tone.OfflineContext(offlineCtx);
+      Tone.setContext(offlineContext);
+      offlineSetup = setup;
+    });
+
+    playlist.ee.on("audiorenderingfinished", function() {
+      Tone.setContext(toneCtx);
+    });
+
+    // Inicializa o efeito de Pitch Shift
+    pitchShift = new Tone.PitchShift(0);
+
+    // Carrega as faixas na playlist
+    playlist.load([
+      {
+        src: "./vocals.wav",
+        name: "Vocals",
+        effects: function(graphEnd, masterGainNode, isOffline) {
+          Tone.connect(graphEnd, pitchShift);
+          Tone.connect(pitchShift, masterGainNode);
+          return function cleanup() {
+            // Não desconectar pitchShift aqui
+            // pitchShift.disconnect();
+            // pitchShift.dispose();
+          }
+        }
+      },
+      {
+        src: "./guitar.wav",
+        name: "Guitar",
+        effects: function(graphEnd, masterGainNode, isOffline) {
+          Tone.connect(graphEnd, pitchShift);
+          Tone.connect(pitchShift, masterGainNode);
+          return function cleanup() {
+            // Não desconectar pitchShift aqui
+            // pitchShift.disconnect();
+            // pitchShift.dispose();
+          }
+        }
+      },
+      {
+        src: "./drums.wav",
+        name: "Drums",
+        effects: function(graphEnd, masterGainNode, isOffline) {
+          Tone.connect(graphEnd, pitchShift);
+          Tone.connect(pitchShift, masterGainNode);
+          return function cleanup() {
+            // Não desconectar pitchShift aqui
+            // pitchShift.disconnect();
+            // pitchShift.dispose();
+          }
+        }
+      }
+      // Adicione mais faixas conforme necessário
+    ]).then(function() {
+      // Adiciona eventos de clique aos botões
+      document.getElementById("play-btn").addEventListener("click", function() {
+        playlist.play(); // Inicia a reprodução da playlist
+      });
+
+      document.getElementById("stop-btn").addEventListener("click", function() {
+        playlist.pause(); // Pausa a reprodução da playlist
+      });
+
+      // Adiciona eventos para sliders
+      document.getElementById("pitch").addEventListener("input", function() {
+        pitchShift.pitch = parseFloat(this.value);
+        document.getElementById("pitch-value").textContent = this.value;
+      });
+    });
+
+  
+  </script>
+</body>
+</html>

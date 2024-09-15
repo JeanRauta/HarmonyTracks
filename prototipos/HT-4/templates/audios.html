@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faixas Separadas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='libs/waveform-playlist/styles/playlist.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/audios.css') }}">
+</head>
+<body>
+    <header>
+        <a onclick="goBackAndClose()">
+            <i class="gg-chevron-left"></i>
+            <h1>HarmonyTracks</h1>
+        </a>
+    </header>
+    <main>
+        <div id="track-controls">
+            <div style="color: #C3A364;">{{original_filename}}</div>
+        </div>
+        <div id="faixas">
+            <div id="playlist"></div>
+            <div class="checkAlign">
+                <input type="checkbox" name="auto" id="auto">
+                <label style="color: white;" for="auto">Seguir</label>
+            </div>
+        </div>
+    </main>
+
+    <div class="controls">
+        <div>
+            <input type="range" id="master-volume" min="0" max="100" value="100" title="Volume">
+            <button class="playPause gg-play-button"></i></button>
+        </div>
+        <input type="range" id="seek-range" min="0.01" max="100" step="0.1" value="0.01">
+    </div>
+
+    <script src="{{ url_for('static', filename='libs/waveform-playlist/build/waveform-playlist.var.min.js') }}"></script>
+    <script>
+        var acordes = [
+            {% for acorde in acordes %}
+            { timestamp: {{ acorde.timestamp }}, chord: "{{ acorde.chord }}" },
+            {% endfor %}
+        ];
+
+        function goBackAndClose() {
+            window.history.back();
+            window.close();
+        }
+
+        var playlist = WaveformPlaylist.init({
+            container: document.getElementById("playlist"),
+            controls: { show: false },
+            zoomLevels: [500, 1000, 3000, 4000],
+            waveHeight: 82,
+            state: "cursor",
+            isAutomaticScroll: false,
+            waveStyle: 'bars',
+            seekStyle: "line",
+            timescale: true,
+            samplesPerPixel: 3000,
+            barWidth: 3,
+            barGap: 1,
+        });
+
+        playlist.load([
+            {% for audio_tag in audio_tags %}
+            { src: "{{ audio_tag.src }}", name: "{{ audio_tag.name }}" },
+            {% endfor %}
+        ]).then(function() {
+            var ee = playlist.getEventEmitter();
+            var seekRange = document.getElementById('seek-range');
+
+            let playPause = document.querySelector('.playPause');
+            let isPlaying = false;
+            
+            function togglePlayPause() {
+                if (isPlaying) {
+                    ee.emit("pause");
+                    playPause.classList.remove('gg-play-pause')
+                    playPause.classList.add('gg-play-button')
+                } else {
+                    ee.emit("play");
+                    playPause.classList.remove('gg-play-button')
+                    playPause.classList.add('gg-play-pause')
+                }
+                isPlaying = !isPlaying;
+            }
+            
+            playPause.addEventListener('click', togglePlayPause);
+
+            document.addEventListener('keydown', function(event) {
+                if (event.code === 'Space') {
+                    event.preventDefault(); 
+                    togglePlayPause();
+                }
+            });
+
+            seekRange.addEventListener('input', function(event) {
+                var seekPercentage = parseFloat(event.target.value);
+                var duration = getPlaylistDuration();
+                var seekTime = (seekPercentage / 100) * duration;
+                ee.emit("select", seekTime, seekTime);
+            });
+
+            ee.on('timeupdate', function(time) {
+                var duration = getPlaylistDuration();
+                var percentage = (time / duration) * 100;
+                seekRange.value = percentage;
+            });
+
+            function getPlaylistDuration() {
+                return playlist.tracks.reduce(function(max, track) {
+                    return Math.max(max, track.getEndTime());
+                }, 0);
+            }
+
+            playlist.tracks.forEach(function(track, index) {
+                var trackControls = document.createElement('div');
+                trackControls.className = 'track-controls';
+                var ordem = ["bateria", "baixo", "outros", "vocal", "guitar", "piano"];
+                trackControls.innerHTML = `
+                    <div class="headControls">
+                        <div style="color: #C3A364;">${ordem[index]}</div>
+                        <div class="btn-control">
+                            <button class="mute-btn" data-track="${index}">M</button>
+                            <button class="solo-btn" data-track="${index}">S</button>
+                        </div>
+                    </div>
+                    <label><input type="range" class="volume-slider" data-track="${index}" min="0" max="100" step="1" value="100"></label>
+                    <div class="pan-n"><p>L</p><label><input type="range" class="pan-slider" data-track="${index}" min="-1" max="1" step="1" value="0"></label><p>R</p></div>
+                `;
+                document.getElementById('track-controls').appendChild(trackControls);
+            });
+
+            document.querySelectorAll('.mute-btn').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var trackIndex = this.getAttribute('data-track');
+                    ee.emit('mute', playlist.tracks[trackIndex]);
+                    this.classList.toggle('active');
+                });
+            });
+
+            document.querySelectorAll('.solo-btn').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var trackIndex = this.getAttribute('data-track');
+                    ee.emit('solo', playlist.tracks[trackIndex]);
+                    this.classList.toggle('active');
+                });
+            });
+
+            document.getElementById('master-volume').addEventListener('input', function() {
+                var volume = parseFloat(this.value);
+                ee.emit('mastervolumechange', volume);
+            });
+
+            document.getElementById('auto').addEventListener('change', function() {
+                ee.emit("automaticscroll", this.checked);
+            });
+
+            document.querySelectorAll('.volume-slider').forEach(function(inp, i) {
+                inp.addEventListener('input', function() {
+                    var volume = parseFloat(this.value);
+                    ee.emit('volumechange', volume ,playlist.tracks[i]);
+                });
+            });
+
+            document.querySelectorAll('.pan-slider').forEach(function(inp, i) {
+                inp.addEventListener('input', function() {
+                    var valor = parseFloat(this.value);
+                    ee.emit('stereopan', valor ,playlist.tracks[i]);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

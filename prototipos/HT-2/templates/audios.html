@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faixas separadas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='libs/waveform-playlist/styles/playlist.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/icons.css') }}">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: "Inter", sans-serif;
+        }
+        body {
+            background-color: #121212;
+            height: 2000px;
+        }
+        header {
+            display: flex;
+            align-items: center;
+            height: 60px;
+        }
+        header > a {
+            margin: 10px 30px;
+            display: flex;
+            gap: 15px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        header > a > h1 {
+            color: #C3A364;
+            font-size: large;
+        }
+        main {
+            margin: auto;
+            width: 95vw;
+            display: flex;
+            align-items: center;
+            background-color: #121212;
+        }
+        #faixas {
+            position: relative;
+            width: 100%;
+        }
+        .checkAlign {
+            gap: 4px;
+            display: flex;
+            position: absolute;
+            right: 0;
+        }
+        .time {
+            color: #C3A364 !important;
+        }
+        .track-controls {
+            display: flex;
+            flex-direction: column;
+            width: 180px;
+            padding: 5px;
+            height: 68px;
+            margin: 5px 0;
+            margin-right: 4px;
+            flex-wrap: nowrap;
+            align-content: center;
+            align-items: center;
+        }
+        .controls {
+            background-color: #121212;
+            display: flex;
+            justify-content: left;
+            flex-direction: column;
+            align-items: center;
+            flex-wrap: nowrap;
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translate(-50%);
+            width: 100vw;
+            padding: 10px;
+            padding-bottom: 30px;
+            z-index: 1;
+        }
+        .controls > div {
+            position: relative;
+        }
+        #seek-range {
+            width: 350px;
+        }
+        #master-volume {
+            top: 0px;
+            left: 0px;
+            position: absolute;
+            rotate: -90deg;
+            transform: translate(75px, -85px);
+        }
+        .volume-slider {
+            width: 175px;
+        }
+        .pan-slider {
+            width: 80px;
+        }
+        .headControls {
+            justify-content: space-between;
+            width: 100%;
+            display: flex;
+            margin-bottom: 8px;
+        }
+        .pan-n {
+            color: #C3A364;
+            display: flex;
+        }
+        .pan-n :nth-child(1) {
+            margin-right: 5px;
+        }
+        .pan-n :nth-child(3) {
+            margin-left: 5px;
+        }
+        .channel-progress{
+            background-color: #C3A364 !important;
+        }
+        .chord-image {
+            max-width: 100%;
+            height: auto;
+        }
+        #chord-image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a onclick="goBackAndClose()"><i class="gg-chevron-left"></i>
+        <h1>HarmonyTracks</h1></a>
+    </header>
+    <main>
+        <div id="track-controls"><div style="color: #C3A364;">Audio Name</div></div>
+        <div id="faixas">
+            <div id="playlist"></div>
+            <div class="checkAlign"><input type="checkbox" name="auto" id="auto"><label style="color: white;" for="auto">Seguir</label></div>
+        </div>
+    </main>
+    <div id="current-chord">Acorde atual: </div>
+    <div id="next-chord">Próximo acorde: </div>
+    <div id="chord-image-container">
+        <img id="chord-image" class="chord-image" src="" alt="Imagem do acorde atual">
+    </div>
+
+    <div class="controls">
+        <div>
+            <input type="range" id="master-volume" min="0" max="100" value="100" title="Volume">
+            <div class="play">
+                <button>vol</button>
+                <button id="custom-play">Play</button>
+                <button id="custom-pause">Pause</button>
+            </div>
+        </div>
+        <input type="range" id="seek-range" min="0.01" max="100" step="0.1" value="0.01">
+    </div>
+
+    <script src="{{ url_for('static', filename='libs/waveform-playlist/build/waveform-playlist.var.min.js') }}"></script>
+    <script>
+        function goBackAndClose() {
+            window.history.back();
+            window.close();
+        }
+
+        var acordes = [
+            {% for acorde in acordes %}
+            { timestamp: {{ acorde.timestamp }}, chord: "{{ acorde.chord }}" },
+            {% endfor %}
+        ];
+
+        var playlist = WaveformPlaylist.init({
+            container: document.getElementById("playlist"),
+            controls: {
+                show: false, 
+            },
+            zoomLevels: [500, 1000, 3000, 4000],
+            waveHeight: 82,
+            state: "cursor",
+            isAutomaticScroll: false,
+            waveStyle: 'bars',
+            seekStyle: "line",
+            timescale: true,
+            samplesPerPixel: 3000,
+            barWidth: 3,
+            barGap: 1,
+        });
+
+        playlist.load([
+            {% for audio_tag in audio_tags %}
+            {
+                src: "{{ audio_tag.src }}",
+                name: "{{ audio_tag.name }}"
+            },
+            {% endfor %}
+        ]).then(function() {
+            var ee = playlist.getEventEmitter();
+
+            var seekRange = document.getElementById('seek-range');
+
+            document.getElementById('custom-play').addEventListener('click', function() {
+                ee.emit("play");
+            });
+
+            document.getElementById('custom-pause').addEventListener('click', function() {
+                ee.emit("pause");
+            });
+
+            ee.on('timeupdate', function(playbackPosition) {
+                updateChords(playbackPosition);
+            });
+
+            function updateChords(playbackPosition) {
+                var currentChord = "Sem acorde";
+                var nextChord = "Sem acorde";
+                
+                var adjustedPlaybackPosition = playbackPosition + 0.2;
+
+                for (var i = 0; i < acordes.length; i++) {
+                    if (adjustedPlaybackPosition >= acordes[i].timestamp && 
+                    (i == acordes.length - 1 || adjustedPlaybackPosition < acordes[i + 1].timestamp)) {
+                        currentChord = acordes[i].chord;
+                        
+                        if (i < acordes.length - 1) {
+                            nextChord = acordes[i + 1].chord;
+                        }
+                        break;
+                    }
+                }
+                
+                document.getElementById("current-chord").innerText = "Acorde atual: " + currentChord;
+                document.getElementById("next-chord").innerText = "Próximo acorde: " + nextChord;
+                updateChordImage(currentChord);
+            }
+
+            function updateChordImage(currentChord) {
+                var chordName = currentChord.split('/')[0].trim();
+                var chordImage = document.getElementById('chord-image');
+                chordImage.src = "{{ url_for('static', filename='img/chords/') }}" + chordName + ".png";
+                chordImage.alt = "Imagem do acorde " + chordName;
+            }
+
+            seekRange.addEventListener('input', function(event) {
+                var seekPercentage = parseFloat(event.target.value);
+                var duration = getPlaylistDuration();
+                var seekTime = (seekPercentage / 100) * duration;
+                ee.emit("select", seekTime, seekTime);
+            });
+
+            ee.on('timeupdate', function(time) {
+                var duration = getPlaylistDuration();
+                var percentage = (time / duration) * 100;
+                seekRange.value = percentage;
+            });
+
+            function getPlaylistDuration() {
+                var duration = 0;
+                playlist.tracks.forEach(function(track) {
+                    if (track.getEndTime() > duration) {
+                        duration = track.getEndTime();
+                    }
+                });
+                return duration;
+            }
+
+            playlist.tracks.forEach(function(track, index) {
+                var trackControls = document.createElement('div');
+                trackControls.className = 'track-controls';
+                let ordem = ["bateria", "baixo", "outros", "vocal", "guitar", "piano"];
+                trackControls.innerHTML = `
+                    <div class="headControls">
+                        <div style="color: #C3A364;">${ordem[index]}</div>
+                        <div class="btn-control">
+                            <button class="mute-btn" data-track="${index}">Mute</button>
+                            <button class="solo-btn" data-track="${index}">Solo</button>
+                        </div>
+                    </div>
+                    <label><input type="range" class="volume-slider" data-track="${index}" min="0" max="1" step="0.01" value="1"></label>
+                    <div class="pan-n"><p>L</p><label><input type="range" class="pan-slider" data-track="${index}" min="-1" max="1" step="1" value="0"></label><p>R</p></div>
+                `;
+                document.getElementById('track-controls').appendChild(trackControls);
+            });
+
+            document.querySelectorAll('.mute-btn').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var trackIndex = this.getAttribute('data-track');
+                    ee.emit('mute', playlist.tracks[trackIndex]);
+                });
+            });
+
+            document.querySelectorAll('.solo-btn').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var trackIndex = this.getAttribute('data-track');
+                    ee.emit('solo', playlist.tracks[trackIndex]);
+                });
+            });
+
+            document.querySelectorAll('.volume-slider').forEach(function(slider) {
+                slider.addEventListener('input', function() {
+                    var trackIndex = this.getAttribute('data-track');
+                    var volume = parseFloat(this.value);
+                    ee.emit('volumechange', volume, playlist.tracks[trackIndex]);
+                });
+            });
+
+            document.querySelectorAll('.pan-slider').forEach(function(slider) {
+                slider.addEventListener('input', function() {
+                    var trackIndex = this.getAttribute('data-track');
+                    var pan = parseFloat(this.value);
+                    ee.emit('stereopan', pan, playlist.tracks[trackIndex]);
+                });
+            });
+
+            document.getElementById('master-volume').addEventListener('input', function() {
+                var volume = parseFloat(this.value);
+                ee.emit('mastervolumechange', volume);
+            });
+
+            document.getElementById('auto').addEventListener('change', function() {
+                ee.emit("automaticscroll", this.checked);
+            });
+        });
+    </script>
+</body>
+</html>

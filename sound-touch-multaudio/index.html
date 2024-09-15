@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reprodutor de Áudio</title>
+  <script src="soundtouch.js" defer></script>
+  <script src="main.js" defer></script>
+  <style>
+    *{
+      padding: 0;
+      margin: 0;
+    }
+
+    .audio-container {
+      margin-bottom: 20px;
+    }
+  
+    .multControler {
+      background-color: aqua;
+      width: 80vw;
+      height: 100px;
+      position: relative;
+    }
+  
+    .mark {
+      background-color: rgb(255, 0, 0);
+      width: 4px;
+      height: 100%;
+      position: absolute;
+      cursor: grab;
+      transition: left 0.1s linear; 
+    }
+
+    #loading {
+      text-align: center;
+      font-size: 20px;
+      margin: auto;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+    }
+
+    #content {
+      display: none;
+    }
+
+    #masterVolumePercentage {
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="loading">Carregando faixas...</div>
+  <div id="content">
+    <button id="playPauseButton">Play</button>
+  
+    <label for="tempoSlider">Tempo (BPM):</label>
+    <input type="range" id="tempoSlider" min="60" max="180" step="1" value="120">
+  
+    <label for="pitchSlider">Pitch (semitons):</label>
+    <input type="range" id="pitchSlider" min="-12" max="12" step="1" value="0">
+  
+    <br>
+    <label for="seekSlider">Seek:</label>
+    <input type="range" id="seekSlider" min="0" max="100" value="0" step="0.01">
+    <div id="currentTime">0:00</div>
+
+    <label for="masterVolumeSlider">Volume Master:</label>
+    <input type="range" id="masterVolumeSlider" min="0" max="1" value="1" step="0.01">
+    <span id="masterVolumePercentage">100%</span>
+
+    <div id="audioControls" aria-live="polite"></div>
+
+    <div class="multControler">
+      <div class="mark" role="slider" aria-label="Mark"></div>
+    </div>
+  </div>
+</body>
+</html>

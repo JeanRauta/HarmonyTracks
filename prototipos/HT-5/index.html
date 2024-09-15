@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HarmonyTracks</title>
+    <link rel="stylesheet" href="./style/index.css">
+    <script>
+        function fileInputChangeHandler(event) {
+            const fileInput = event.target;
+            const fileName = fileInput.files[0].name;
+            document.querySelector('.file-name').textContent = fileName;
+        }
+
+        function dragEnterHandler(event) {
+            event.preventDefault();
+            event.target.classList.add('highlight');
+        }
+
+        function dragLeaveHandler(event) {
+            event.preventDefault();
+            event.target.classList.remove('highlight');
+        }
+
+        function dropHandler(event) {
+            event.preventDefault();
+            const fileInput = document.getElementById('file-input');
+            fileInput.files = event.dataTransfer.files;
+            document.querySelector('.file-name').textContent = fileInput.files[0].name;
+            event.target.classList.remove('highlight');
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('error').style.display = 'none'; 
+        }
+
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault();
+            showLoading();
+
+            const fileInput = document.getElementById('file-input');
+            const urlInput = document.querySelector('.url-input').value;
+            const modelSelect = document.getElementById('model').value;
+            const formData = new FormData();
+
+            if (fileInput.files.length > 0) {
+                formData.append('file', fileInput.files[0]);
+            } else if (urlInput) {
+                formData.append('url', urlInput);
+            } else {
+                showError("Por favor, forneça um arquivo ou uma URL.");
+                return;
+            }
+
+            formData.append('model', modelSelect);
+
+            fetch('http://localhost:5000/separar', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    showError(`Erro: ${data.error}`);
+                } else {
+                    sessionStorage.setItem('audioResult', JSON.stringify(data));
+                    window.location.href = 'resultado.html';
+                }
+            })
+            .catch(error => {
+                showError(`Erro ao enviar os dados: ${error}`);
+            })
+            .finally(() => {
+                document.getElementById('loading').style.display = 'none';
+            });
+        }
+
+        function addModelToForm(event) {
+            event.preventDefault();
+            handleSubmit(event);
+        }
+    </script>
+</head>
+<body>
+    <div class="flex">
+        <h2 class="h2_tittle">Separe suas faixas musicais isolando vocais, instrumentos, batidas, linhas de baixo e muito mais</h2>
+        
+        <div id="file-input-container" ondragover="event.preventDefault()" ondrop="dropHandler(event)" ondragenter="dragEnterHandler(event)" ondragleave="dragLeaveHandler(event)">
+            <p>Escolha um arquivo de áudio</p>
+            <form id="audioForm" enctype="multipart/form-data" onsubmit="addModelToForm(event)">
+                <label class="input-file" for="file-input">Escolher arquivo</label>
+                <input type="file" style="display: none;" id="file-input" name="file" accept=".mp3,.wav,.flac" onchange="fileInputChangeHandler(event)">
+                <p class="suporte">Suporte: .mp3, .wav</p>
+                <div class="file-name"></div>
+                <button class="env-file" type="submit">Enviar Arquivo</button>
+            </form>
+            <p style=" width: 100vw;text-align: center; line-height: 30px;">ou <br> cole o link de um vídeo do YouTube</p>
+
+            <form class="form-flex" onsubmit="addModelToForm(event)">
+                <input class="url-input" type="text" name="url" placeholder="URL">
+                <button class="env-url" type="submit">Enviar</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="config-model">
+        <p>Opções avançadas</p>
+        <select name="model" id="model">
+            <option title="vocal, bass, drum, guitar, piano, outros" value="d6">Demucs/6 faixas (htdemucs_6s)</option>
+            <option title="vocal, bass, drum, outros" value="d4">Demucs/4 faixas (htdemucs_ft)</option>
+            <option title="vocal, instrumental" value="d2">Demucs/2 faixas (htdemucs_ft)</option>
+        </select>
+    </div>
+
+    <div id="loading" style="display: none;">
+        <p style="text-align: center;">Processando... Por favor, aguarde.</p>
+    </div>
+    <div id="error" style="display: none; margin: auto; text-align: center; color: red;">
+        <p id="errorMessage"></p>
+    </div>
+</body>
+</html>
