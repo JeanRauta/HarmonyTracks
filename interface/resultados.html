@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faixas Separadas com Mudança de Tom</title>
+    <link rel="stylesheet" href="https://unpkg.com/waveform-playlist@4.2.2/styles/playlist.css">
+    <script src="https://unpkg.com/tone@15.0.4/build/Tone.js"></script>
+    <script src="https://unpkg.com/waveform-playlist@4.2.2/build/waveform-playlist.var.min.js"></script>
+    <style>
+        .visualizer { width: 100%; height: 200px; }
+        .controls { margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Faixas Separadas</h1>
+    <button type="button" id="btn-play" title="Play">
+        Play
+    </button>
+    <button type="button" id="btn-pause" title="Pause">
+        Pause
+    </button>
+    <div id="playlist"></div>
+    <canvas class="visualizer" width="800" height="200"></canvas>
+
+    <div class="controls">
+        <label for="pitch">Mudança de Tom (semitones):</label>
+        <input type="range" id="pitch" min="-24" max="24" step="1" value="0">
+        <span id="pitch-value">0</span>
+    </div>
+
+    <script>
+        var toneCtx = Tone.getContext();
+        var audioCtx = toneCtx.rawContext;
+        var analyser = audioCtx.createAnalyser();
+        var pitchShift;
+
+        // Inicializa o playlist
+        var playlist = WaveformPlaylist.init({
+            ac: audioCtx,
+            barWidth: 3,
+            barGap: 1,
+            container: document.getElementById("playlist"),
+            colors: { waveOutlineColor: '#005BBB' },
+            controls: { show: true, width: 200 },
+            zoomLevels: [500, 1000, 3000, 5000],
+            samplesPerPixel: 1000,
+            waveHeight: 100,
+            isAutomaticScroll: true,
+            timescale: true,
+            state: "cursor",
+            effects: function(masterGainNode, destination, isOffline) {
+                if (!isOffline) masterGainNode.connect(analyser);
+                masterGainNode.connect(destination);
+            }
+        });
+
+        playlist.initExporter();
+
+        // Inicializa o efeito de Pitch Shift
+        pitchShift = new Tone.PitchShift(0);
+        
+        // Carrega as faixas na playlist
+        async function carregarFaixas() {
+            const token = sessionStorage.getItem('token');
+            const response = await fetch('http://127.0.0.1:5000/api/dados-sessao', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const result = await response.json();
+            if (result.dados && result.dados.faixas_separadas) {
+                const audioTags = result.dados.faixas_separadas.audio_tags;
+
+                // Adiciona as faixas à playlist com o efeito de Pitch Shift
+                audioTags.forEach(track => {
+                    playlist.load([{
+                        src: track.src,
+                        name: track.name,
+                        effects: function(graphEnd, masterGainNode, isOffline) {
+                            Tone.connect(graphEnd, pitchShift);
+                            Tone.connect(pitchShift, masterGainNode);
+                            return function cleanup() {
+                                // Não desconectar pitchShift aqui
+                            }
+                        }
+                    }]);
+                });
+            } else {
+                alert('Erro ao obter os dados da sessão.');
+            }
+        }
+
+        carregarFaixas().then(() => {
+            // Adiciona eventos de clique aos botões
+            document.getElementById("btn-play").addEventListener("click", function() {
+                playlist.play(); // Inicia a reprodução da playlist
+            });
+
+            document.getElementById("btn-pause").addEventListener("click", function() {
+                playlist.pause(); // Pausa a reprodução da playlist
+            });
+
+            // Adiciona eventos para sliders
+            document.getElementById("pitch").addEventListener("input", function() {
+                pitchShift.pitch = parseFloat(this.value);
+                document.getElementById("pitch-value").textContent = this.value;
+            });
+        });
+
+        async function renovarToken() {
+            const token = sessionStorage.getItem('token');
+            if (token) {
+                await fetch('http://127.0.0.1:5000/api/renovar-token', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                console.log('Token renovado.');
+            }
+        }
+
+        // Renovação do token a cada 5 segundos
+        setInterval(renovarToken, 5000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+* {
+    color: #C3A364;
+    margin: 0;
+    padding: 0;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+body{
+    background-color: #121212;
+}
+
+header {
+    height: 60px;
+}
+
+.div-logo {
+    font-size: x-large;
+    padding: 20px;
+    font-weight: 400;
+}
+
+.flex {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    height: 70%;
+    width: 100vw;
+}
+
+.h2_tittle {
+    margin-bottom: 20px;
+    margin-top: 100px;
+    text-align: center;
+    font-weight: 400;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-content: center;
+    align-items: center;
+    height: 900px;
+}
+
+.input-file {
+    background-color: rgba(88, 88, 88, 0.219);
+    width: 250px;
+    height: 50px;
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    font-size: large;
+    cursor: pointer;
+}
+
+.suporte {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    font-size: smaller;
+    color: #636363;
+}
+
+.file-name {
+    width: 250px;
+    margin-top: 20px;
+    font-size: 16px;
+}
+
+.env-file {
+    background-color: rgba(131, 131, 131, 0.301);
+    border: none;
+    width: 250px;
+    height: 30px;
+    border: 1.5px solid rgba(0, 0, 0, 0.26);
+    transition: .1s;
+
+}
+
+.env-file:hover {
+    background-color: rgba(255, 228, 196, 0.774);
+    cursor: pointer;
+    color: #121212;
+}
+
+.form-flex {
+    display: flex;
+}
+
+.url-input:focus {
+    padding-left: 10px;
+    width: 700px;
+    height: 23px;
+    color: #121212;
+    border-collapse: collapse;
+    border-radius: 4px 0px 0px 4px;
+    border: 1px solid rgba(0, 0, 0, 0.39);
+    background-color: rgb(240, 248, 255);
+}
+
+.url-input {
+    padding-left: 10px;
+    width: 700px;
+    height: 23px;
+    color: #121212;
+    border-collapse: collapse;
+    border-radius: 4px 0px 0px 4px;
+    border: 1px solid rgba(0, 0, 0, 0.39);
+    background-color: rgba(240, 248, 255, 0.603);
+}
+
+.env-url {
+    background-color: rgba(109, 109, 109, 0.226);
+    border: none;
+    width: 60px;
+    height: 25px;
+    font-size: small;
+    border-radius: 0px 4px 4px 0px;
+    border: 1px solid rgba(0, 0, 0, 0.527);
+    border-collapse: collapse;
+    transition: .1s;
+}
+
+.env-url:hover {
+    cursor: pointer;
+    background-color: rgba(255, 228, 196, 0.774);
+    color: #121212;
+}
+
+#file-input-container {
+    border: 1.5px dashed #838383;
+    border-radius: 15px;
+    padding: 10px;
+    display: flex;
+    justify-content: space-around;
+    align-content: center;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    align-items: center;
+    height: 300px;
+    width: 972px;
+    margin: auto;
+}
+
+#file-input-container.highlight {
+    border: 2px dotted green;
+}
+
+.config-model {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    margin-top: 20px;
+    width: 972px;
+}
+
+#model{
+    background-color: #121212;
+    margin: 5px;
+    margin-top: 25px;
+    border: 1px solid #C3A364;
+    color: #C3A364;
+    padding-left: 2px;
+    font-weight: 400;
+    border-radius: 2px;
+    width: 170px;
+    padding-left: 10px;
+    transition: 0.3s;
+    height: 30px;
+    outline: none;
+}
+

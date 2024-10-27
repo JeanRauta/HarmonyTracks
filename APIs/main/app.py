@@ -76,15 +76,21 @@ def renovar_token():
 @app.route('/api/separar-faixas', methods=['POST'])
 def separar_faixas():
     token = request.headers.get('Authorization').split(" ")[1]
-    
+
     if sessions_collection.find_one({"token_sessao": token}):
         audio_file = request.files.get('file')
+        url = request.form.get('url')
         model = request.form.get('model')
 
         try:
-            response = requests.post('http://localhost:5001/separar-faixas', files={'file': audio_file}, data={'model': model})
-            resultado = response.json()
+            if audio_file:
+                response = requests.post('http://localhost:5001/separar-faixas', files={'file': audio_file}, data={'model': model})
+            elif url:
+                response = requests.post('http://localhost:5001/separar-faixas', data={'url': url, 'model': model})
+            else:
+                return jsonify({"error": "Nenhum arquivo ou URL fornecido"}), 400
 
+            resultado = response.json()
             original_filename = resultado.get("original_filename")
             faixas_separadas = {
                 "original_filename": original_filename,
@@ -97,6 +103,7 @@ def separar_faixas():
             return jsonify({"error": f"Ocorreu um erro: {str(e)}"}), 500
     else:
         return jsonify({"error": "Token inválido ou expirado."}), 401
+
 
 @app.route('/api/identificar-acordes', methods=['POST'])
 def identificar_acordes():
@@ -144,3 +151,20 @@ def converter_midi():
     else:
         return jsonify({"error": "Token inválido ou expirado."}), 401
 
+@app.route('/api/dados-sessao', methods=['GET'])
+def obter_dados_sessao():
+    token = request.headers.get('Authorization')
+    
+    if not token:
+        return jsonify({"error": "Token não fornecido."}), 401
+
+    token = token.split(" ")[1]
+
+    session_data = sessions_collection.find_one({"token_sessao": token})
+
+    if session_data:
+        session_data.pop("_id", None)
+        session_data.pop("createdAt", None)
+        return jsonify(session_data), 200
+    else:
+        return jsonify({"error": "Token inválido ou expirado."}), 401

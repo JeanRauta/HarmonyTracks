@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Separar Faixas</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div class="flex">
+        <h2 class="h2_tittle">Separe suas faixas musicais isolando vocais, instrumentos, batidas, linhas de baixo e muito mais</h2>
+        
+        <div id="file-input-container" 
+             ondragover="event.preventDefault()" 
+             ondrop="dropHandler(event)" 
+             ondragenter="dragEnterHandler(event)" 
+             ondragleave="dragLeaveHandler(event)">
+            <p>Escolha um arquivo de áudio</p>
+            <form id="audioForm" enctype="multipart/form-data" onsubmit="addModelToForm(event)">
+                <label class="input-file" for="file-input">Escolher arquivo</label>
+                <input type="file" style="display: none;" id="file-input" name="file" accept=".mp3,.wav,.flac" onchange="fileInputChangeHandler(event)">
+                <p class="suporte">Suporte: .mp3, .wav</p>
+                <div class="file-name"></div>
+                <button class="env-file" type="submit">Enviar Arquivo</button>
+            </form>
+            <p style=" width: 100vw;text-align: center; line-height: 30px;">ou <br> cole o link de um vídeo do YouTube</p>
+
+            <form class="form-flex" onsubmit="addModelToForm(event)">
+                <input class="url-input" type="text" name="url" placeholder="URL">
+                <button class="env-url" type="submit">Enviar</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="config-model">
+        <p>Opções avançadas</p>
+        <select name="model" id="model">
+            <option title="vocal, bass, drum, guitar, piano, outros" value="d6">Demucs/6 faixas (htdemucs_6s)</option>
+            <option title="vocal, bass, drum, outros" value="d4">Demucs/4 faixas (htdemucs_ft)</option>
+            <option title="vocal, instrumental" value="d2">Demucs/2 faixas (htdemucs_ft)</option>
+        </select>
+    </div>
+
+    <div id="loading" style="display: none;">
+        <p>Processando... Por favor, aguarde.</p>
+    </div>
+    <div id="error" style="display: none;">
+        <p id="errorMessage"></p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', iniciarSessao);
+
+        async function iniciarSessao() {
+            const token = sessionStorage.getItem('token');
+            const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+
+            const response = await fetch('http://127.0.0.1:5000/api/iniciar-sessao', {
+                method: 'POST',
+                headers: headers
+            });
+            if (!response.ok) {
+                alert('Erro ao iniciar sessão. Tente novamente.');
+                return;
+            }
+            const data = await response.json();
+            sessionStorage.setItem('token', data.token_sessao);
+            console.log('Token gerado:', data.token_sessao);
+            renovarToken();
+            setInterval(renovarToken, 5000);
+        }
+
+        async function renovarToken() {
+            const token = sessionStorage.getItem('token');
+            if (token) {
+                await fetch('http://127.0.0.1:5000/api/renovar-token', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                console.log('Token renovado.');
+            }
+        }
+
+        async function addModelToForm(event) {
+            event.preventDefault();
+            const form = event.target;
+            const token = sessionStorage.getItem('token');
+            const formData = new FormData(form);
+            formData.append('model', document.getElementById('model').value);
+            
+            const response = await fetch('http://127.0.0.1:5000/api/separar-faixas', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+
+            const result = await response.json();
+            console.log(result);
+
+            if (result.audio_tags) {
+                window.location.href = `resultados.html?token=${token}`;
+            } else {
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('errorMessage').innerText = 'Erro ao separar as faixas.';
+            }
+        }
+    </script>
+</body>
+</html>
