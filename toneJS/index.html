@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Change Pitch of Multiple Audios with Tone.js</title>
+  <script src="https://unpkg.com/tone@15.0.4/build/Tone.js"></script>
+</head>
+<body>
+
+<h1>Change Pitch of Multiple Audio Files</h1>
+
+<!-- Botão para tocar todos os áudios -->
+<button id="playAudio">Play All Audios</button>
+<label for="pitchShift">Pitch Shift (semitones): </label>
+<input type="range" id="pitchShift" min="-12" max="12" value="0">
+
+<script>
+  let players = []; // Array para armazenar os players
+  let pitchShifts = []; // Array para armazenar os pitch shifters
+
+  // Array de URLs locais dos arquivos de áudio (coloque os caminhos dos seus arquivos locais)
+  const audioFiles = [
+    './bass.wav',
+    './drums.wav',
+    './guitar.wav',
+    './other.wav',
+    './piano.wav',
+    './vocals.wav'
+  ];
+
+  const playButton = document.getElementById('playAudio');
+  const pitchShiftControl = document.getElementById('pitchShift');
+
+  // Função para carregar os áudios e configurar os players/pitchShifts
+  function loadAudios() {
+    audioFiles.forEach((fileURL, index) => {
+      // Cria um player para cada arquivo de áudio
+      const player = new Tone.Player(fileURL);
+
+      // Cria um pitch shifter e conecta à saída de áudio
+      const pitchShift = new Tone.PitchShift().toDestination();
+
+      // Conecta o player ao pitch shifter
+      player.connect(pitchShift);
+
+      // Armazena o player e o pitch shift
+      players[index] = player;
+      pitchShifts[index] = pitchShift;
+    });
+  }
+
+  // Carregar áudios ao iniciar a página
+  loadAudios();
+
+  // Atualiza o valor do pitch para todos os áudios ao mudar o controle de pitch
+  pitchShiftControl.addEventListener('input', (e) => {
+    const pitchValue = e.target.value; // Valor do pitch (semitons)
+    pitchShifts.forEach(pitchShift => {
+      if (pitchShift) {
+        pitchShift.pitch = pitchValue; // Aplica o pitch a todos os pitch shifters carregados
+      }
+    });
+  });
+
+  // Toca todos os áudios quando o botão é pressionado
+  playButton.addEventListener('click', () => {
+    players.forEach(player => {
+      if (player && player.state !== 'started') {
+        player.start();
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

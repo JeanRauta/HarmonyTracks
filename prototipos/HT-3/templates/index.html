@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HarmonyTracks</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/index.css') }}">
+    <link rel="stylesheet" href="../static/style/index.css">
+    <script>
+        function fileInputChangeHandler(event) {
+            const fileInput = event.target;
+            const fileName = fileInput.files[0].name;
+            document.querySelector('.file-name').textContent = fileName;
+        }
+
+        function dragEnterHandler(event) {
+            event.preventDefault();
+            event.target.classList.add('highlight');
+        }
+
+        function dragLeaveHandler(event) {
+            event.preventDefault();
+            event.target.classList.remove('highlight');
+        }
+
+        function dropHandler(event) {
+            event.preventDefault();
+            const fileInput = document.getElementById('file-input');
+            fileInput.files = event.dataTransfer.files;
+            document.querySelector('.file-name').textContent = fileInput.files[0].name;
+            event.target.classList.remove('highlight');
+        }
+
+        function addModelToForm(event) {
+            event.preventDefault();
+            const form = event.target;
+            const select = document.getElementById('model');
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'model';
+            input.value = select.value;
+            form.appendChild(input);
+            form.submit();
+        }
+    </script>
+</head>
+<body>
+    <div class="flex">
+        <h2 class="h2_tittle">Separe suas faixas musicais isolando vocais, instrumentos, batidas, linhas de baixo e <br>muito mais</h2>
+        <div id="file-input-container" ondragover="event.preventDefault()" ondrop="dropHandler(event)" ondragenter="dragEnterHandler(event)" ondragleave="dragLeaveHandler(event)">
+            <p>Escolha um arquivo de áudio</p>
+            <form action="/separar" method="POST" enctype="multipart/form-data" onsubmit="addModelToForm(event)">
+                <label class="input-file" for="file-input">Escolher arquivo</label>
+                <input type="file" style="display: none;" id="file-input" name="file" accept=".mp3,.wav,.flac" onchange="fileInputChangeHandler(event)">
+                <p class="suporte">Suporte: .mp3, .wav</p>
+                <div class="file-name"></div>
+                <button class="env-file" title="Enviar Arquivo" type="submit">Enviar Arquivo</button>
+            </form>
+            <p style="text-align: center; line-height: 30px;">ou <br> cole o link de um vídeo do YouTube</p>
+            <form class="form-flex" action="/separar" method="POST" onsubmit="addModelToForm(event)">
+                <input class="url-input" type="text" name="url" placeholder="URL">
+                <button title="Enviar URL" class="env-url" type="submit">Enviar</button>
+            </form>
+        </div>
+    </div>
+    <div class="config-model">
+        <p>Opções avançadas</p>
+        <select name="model" id="model">
+            <option title="Voz, baixo, bateria, guitarra, piano" value="d6">Demucs/6 faixas</option>
+            <option title="Voz, baixo, bateria" value="d4">Demucs/4 faixas</option>
+            <option title="Voz, instrumental" value="d2">Demucs/2 faixas</option>
+        </select>
+    </div>
+</body>
+</html>

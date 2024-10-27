@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+    </style>
+
+    <style>
+        *{
+            color: aliceblue;
+        }
+        .control{
+            background-color:#121212;
+            width: 250px;
+            height: 120px;
+            display: flex;
+            justify-content: start;
+            align-items: center;
+            flex-direction: column;
+            padding: 0px 15px 5px 15px;
+        }
+
+        .control > .l1{
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .control > .l1 > div{
+            color: #C3A364;
+            font-size: x-large;
+        }
+
+        .control > .l1 > .l10{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: "Inter", sans-serif;
+        }
+
+        .control > .l1 > .l11 > svg{
+            fill: #C3A364;
+        }
+
+        .control > .l2{
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            
+        }
+
+        .control > .l2 > #testeinp{
+            width: 100px;
+            position: relative;
+        }
+
+        .control > .l2 > #testeinp::after{
+            content: "R";
+            color: white;
+            position: absolute;
+            right: -15px;
+            font-weight: bolder;
+            font-family: "Inter";
+        }
+
+        .control > .l2 > #testeinp::before{
+            content: "L";
+            color: white;
+            position: absolute;
+            left: -15px;
+            font-weight: bolder;
+            font-family: "Inter";
+        }
+
+        .control > .l2 > div{
+            margin-left: 30px;
+        }
+
+        .control > .l2 > div label{
+            font-size: 14px;
+            font-family: "Inter";
+            border: 1px solid #C3A364;
+            border-radius: 8px;
+            padding: 2px 12px;
+            margin: 0px 1.5px;
+            color: #C3A364;
+        }
+
+        .control > .l2 > div > .testecheck1L{
+
+        }
+
+    </style>
+</head>
+<body>
+    <div class="control">
+        <div class="l1">
+            <div class="l10">Guitar</div>
+            <div class="l11">
+                <svg xmlns="http://www.w3.org/2000/svg" height="45px" viewBox="0 -960 960 960" width="45px" fill="#e8eaed"><path d="M240-400q-33 0-56.5-23.5T160-480q0-33 23.5-56.5T240-560q33 0 56.5 23.5T320-480q0 33-23.5 56.5T240-400Zm240 0q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm240 0q-33 0-56.5-23.5T640-480q0-33 23.5-56.5T720-560q33 0 56.5 23.5T800-480q0 33-23.5 56.5T720-400Z"/></svg>
+            </div>
+        </div>
+        <div class="l2">
+                <input type="range" name="testeinp" id="testeinp">
+                <div>
+                    <label class="testecheck1L" for="testecheck1">M</label>
+                    <label class="testecheck2L" for="testecheck2">S</label>
+                    <input style="display: none;" type="checkbox" name="testecheck" id="testecheck1">
+                    <input style="display: none;" type="checkbox" name="testecheck" id="testecheck2">
+                </div>
+        </div>
+        <div class="l3"><input type="range" name="inputvol" id="inputvol"></div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,142 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    font-family: "Inter", sans-serif;
+}
+body {
+    background-color: #121212;
+    height: 2000px;
+}
+header {
+    display: flex;
+    align-items: center;
+    height: 60px;
+}
+header > a {
+    margin: 10px 30px;
+    display: flex;
+    gap: 15px;
+    text-decoration: none;
+    cursor: pointer;
+}
+header > a > h1 {
+    color: #C3A364;
+    font-size: large;
+}
+main {
+    margin: auto;
+    width: 95vw;
+    display: flex;
+    align-items: center;
+    background-color: #1D1D1D;
+    height: min-content;
+}
+#faixas {
+    position: relative;
+    width: 100%;
+    height: min-content;
+}
+.checkAlign {
+    gap: 4px;
+    display: flex;
+    position: absolute;
+    right: 0;
+}
+.track-controls {
+    display: flex;
+    flex-direction: column;
+    width: 180px;
+    padding: 5px;
+    height: 68px;
+    margin: 5px 0;
+    margin-right: 4px;
+    align-content: center;
+    align-items: center;
+}
+.controls {
+    background-color: #121212;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;
+    padding: 10px;
+    padding-bottom: 30px;
+    z-index: 1;
+}
+.controls > div {
+    position: relative;
+}
+#seek-range {
+    width: 350px;
+}
+#master-volume {
+    top: 0;
+    left: 0;
+    position: absolute;
+    transform: rotate(-90deg) translate(75px, -85px);
+}
+.volume-slider {
+    width: 175px;
+}
+.pan-slider {
+    width: 80px;
+}
+.headControls {
+    justify-content: space-between;
+    width: 100%;
+    display: flex;
+    margin-bottom: 8px;
+}
+.pan-n {
+    color: #C3A364;
+    display: flex;
+}
+.pan-n p {
+    margin: 0 5px;
+}
+.channel-progress {
+    background-color: #C3A364 !important;
+}
+.time{
+    color: #C3A364 !important;
+}
+
+.mute-btn {
+    color: #C3A364;
+    border: 1px solid #C3A364;
+    background-color: #1D1D1D;
+    border-radius: 2px;
+    padding: 1px;
+}
+
+.solo-btn {
+    color: #C3A364;
+    border: 1px solid #C3A364;
+    background-color: #1D1D1D;
+    border-radius: 2px;
+    padding: 1px;
+}
+.mute-btn.active {
+    color: #1D1D1D;
+    border: 1px solid #C3A364;
+    background-color: #C3A364;
+}
+
+.solo-btn.active {
+    color: #1D1D1D;
+    border: 1px solid #C3A364;
+    background-color: #C3A364;
+}
+
+.playPause {
+    background-color: aqua;
+    cursor: pointer;
+    border: none;
+    padding: 10px;
+}
