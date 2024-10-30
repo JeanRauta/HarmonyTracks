@@ -1,55 +1,73 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Separar Faixas</title>
+    <title>Separação de Faixas</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=chevron_left" />
     <link rel="stylesheet" href="index.css">
+
 </head>
 <body>
-    <div class="flex">
-        <h2 class="h2_tittle">Separe suas faixas musicais isolando vocais, instrumentos, batidas, linhas de baixo e muito mais</h2>
-        
-        <div id="file-input-container" 
-             ondragover="event.preventDefault()" 
-             ondrop="dropHandler(event)" 
-             ondragenter="dragEnterHandler(event)" 
-             ondragleave="dragLeaveHandler(event)">
-            <p>Escolha um arquivo de áudio</p>
-            <form id="audioForm" enctype="multipart/form-data" onsubmit="addModelToForm(event)">
-                <label class="input-file" for="file-input">Escolher arquivo</label>
-                <input type="file" style="display: none;" id="file-input" name="file" accept=".mp3,.wav,.flac" onchange="fileInputChangeHandler(event)">
-                <p class="suporte">Suporte: .mp3, .wav</p>
-                <div class="file-name"></div>
-                <button class="env-file" type="submit">Enviar Arquivo</button>
-            </form>
-            <p style=" width: 100vw;text-align: center; line-height: 30px;">ou <br> cole o link de um vídeo do YouTube</p>
-
-            <form class="form-flex" onsubmit="addModelToForm(event)">
-                <input class="url-input" type="text" name="url" placeholder="URL">
-                <button class="env-url" type="submit">Enviar</button>
-            </form>
+    <main>
+        <!-- Menu de seleção -->
+        <div class="tab-menu">
+            <ul type="none">
+                <li class="tab-menu-item active" id="local-files-tab">Arquivos locais</li>
+                <li class="tab-menu-item" id="cloud-files-tab">Arquivos na nuvem</li>
+            </ul>
         </div>
-    </div>
 
-    <div class="config-model">
-        <p>Opções avançadas</p>
-        <select name="model" id="model">
-            <option title="vocal, bass, drum, guitar, piano, outros" value="d6">Demucs/6 faixas (htdemucs_6s)</option>
-            <option title="vocal, bass, drum, outros" value="d4">Demucs/4 faixas (htdemucs_ft)</option>
-            <option title="vocal, instrumental" value="d2">Demucs/2 faixas (htdemucs_ft)</option>
-        </select>
-    </div>
+        <!-- Seção de Upload de Arquivo -->
+        <div class="upload-section">
+            <div id="file-dropzone" 
+                 ondragover="event.preventDefault()" 
+                 ondrop="dropHandler(event)" 
+                 ondragenter="dragEnterHandler(event)" 
+                 ondragleave="dragLeaveHandler(event)">
+                <p>Solte seu arquivo aqui ou procure localmente</p>
+                <pre class="file-name"></pre>
+                <form id="audioForm" enctype="multipart/form-data">
+                    <label class="file-button" for="file-input">Procurar no explorador de arquivos</label>
+                    <input type="file" style="display: none;" id="file-input" name="file" accept=".mp3,.wav,.flac" onchange="fileInputChangeHandler(event)">
+                    <p class="file-support-info">Suporte: MP3, WAV</p>
+                </form>
+            </div>
+        </div>
 
-    <div id="loading" style="display: none;">
-        <p>Processando... Por favor, aguarde.</p>
-    </div>
-    <div id="error" style="display: none;">
-        <p id="errorMessage"></p>
-    </div>
+        <!-- Seção de URL -->
+        <div class="url-section" id="url-section">
+            <div id="url-input-container">
+                <form class="form-flex" id="urlForm">
+                    <input class="url-input" type="text" name="url" placeholder="https:// ...">
+                    <p style="margin: 5px 0px 0px 10px;" class="file-support-info">Links de arquivos armazenados na nuvem ou URLs públicas.</p>
+                </form>
+            </div>
+        </div>
+
+        <!-- Opções avançadas e botão de envio -->
+        <div class="advanced-options">
+            <div class="flex-direction">
+                <div class="options-toggle" onclick="toggleAdvancedOptions()">
+                    <span class="arrow-icon material-symbols-outlined">chevron_left</span>
+                    Opções avançadas
+                </div>
+                <div class="advanced-options-content">
+                    <p>Modelo de separação de faixas</p>
+                    <select name="model" id="model-select">
+                        <option title="vocal, bass, drum, guitar, piano, outros" value="d6">Demucs/6 faixas (htdemucs_6s)</option>
+                        <option title="vocal, bass, drum, outros" value="d4">Demucs/4 faixas (htdemucs_ft)</option>
+                        <option title="vocal, instrumental" value="d2">Demucs/2 faixas (htdemucs_ft)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="submit-button" onclick="submitForm()">Enviar</div>
+        </div>
+    </main>
 
     <script>
         document.addEventListener('DOMContentLoaded', iniciarSessao);
+        let opc = true
 
         async function iniciarSessao() {
             const token = sessionStorage.getItem('token');
@@ -83,12 +101,11 @@
             }
         }
 
-        async function addModelToForm(event) {
-            event.preventDefault();
-            const form = event.target;
+        async function submitForm() {
+            const form = opc ? document.getElementById('audioForm') : document.getElementById('urlForm');
             const token = sessionStorage.getItem('token');
             const formData = new FormData(form);
-            formData.append('model', document.getElementById('model').value);
+            formData.append('model', document.getElementById('model-select').value);
             
             const response = await fetch('http://127.0.0.1:5000/api/separar-faixas', {
                 method: 'POST',
@@ -107,6 +124,78 @@
                 document.getElementById('error').style.display = 'block';
                 document.getElementById('errorMessage').innerText = 'Erro ao separar as faixas.';
             }
+        }
+
+        function dragEnterHandler(event) {
+            event.preventDefault(); 
+            event.stopPropagation(); 
+            document.getElementById('file-dropzone').classList.add('drag-over');
+        }
+
+        function dragLeaveHandler(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('file-dropzone').classList.remove('drag-over');
+        }
+
+        function dropHandler(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('file-dropzone').classList.remove('drag-over');
+
+            const files = event.dataTransfer.files;
+            if (files.length > 0) {
+                handleFiles(files);
+            }
+        }
+
+        function handleFiles(files) {
+            const file = files[0];
+            if (file) {
+                document.querySelector('.file-name').innerHTML = file.name
+                const fileInput = document.getElementById('file-input');
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                fileInput.files = dataTransfer.files;
+            }
+        }
+
+        const style = document.createElement('style');
+        style.innerHTML = `
+            #file-dropzone.drag-over {
+                border-color: #C3A364;
+            }
+        `;
+        document.head.appendChild(style);
+
+        function fileInputChangeHandler(event) {
+            const file = event.target.files[0];
+            if (file) {
+                document.querySelector('.file-name').innerHTML = file.name
+            }
+        }
+
+        
+        document.getElementById("local-files-tab").onclick = function() {
+            document.querySelector(".upload-section").style.display = "block";
+            document.getElementById("url-section").style.display = "none";
+            document.getElementById("local-files-tab").classList.add("active");
+            document.getElementById("cloud-files-tab").classList.remove("active");
+            opc = true
+        };
+        
+        document.getElementById("cloud-files-tab").onclick = function() {
+            document.querySelector(".upload-section").style.display = "none";
+            document.getElementById("url-section").style.display = "block";
+            document.getElementById("local-files-tab").classList.remove("active");
+            document.getElementById("cloud-files-tab").classList.add("active");
+            opc = false
+        };
+
+        // Funções para opções avançadas
+        function toggleAdvancedOptions() {
+            document.querySelector('.advanced-options-content').classList.toggle('active');
+            document.querySelector('.options-toggle').classList.toggle('active');
         }
     </script>
 </body>

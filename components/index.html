@@ -4,116 +4,171 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=more_horiz" />
+
+    <style>
+        .material-symbols-outlined {
+          font-variation-settings:
+          'FILL' 0,
+          'wght' 900,
+          'GRAD' 0,
+          'opsz' 30
+        }
+    </style>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
-    </style>
-
-    <style>
-        *{
-            color: aliceblue;
-        }
-        .control{
-            background-color:#121212;
-            width: 250px;
-            height: 120px;
-            display: flex;
-            justify-content: start;
-            align-items: center;
-            flex-direction: column;
-            padding: 0px 15px 5px 15px;
+        
+        * {
+            padding: 0;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            transition: .1s;
+            color: #C3A364 ;
         }
 
-        .control > .l1{
-            display: flex;
-            flex-direction: row;
-            width: 100%;
-            justify-content: space-between;
-        }
 
-        .control > .l1 > div{
-            color: #C3A364;
-            font-size: x-large;
-        }
+      .control{
+        background-color: #121212;
+        width: 250px;
+        height: 93px;
+        margin: 50px 0px 0px 100px;
+        scale: 140%;
+      }
 
-        .control > .l1 > .l10{
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: "Inter", sans-serif;
-        }
+      .sec{
+        background-color: black;
+        display: flex;
+        width: 100%;
+        height: max-content;
+      }
 
-        .control > .l1 > .l11 > svg{
-            fill: #C3A364;
-        }
+      .sec.sec01{
+        flex-direction: row;
+      }
 
-        .control > .l2{
-            display: flex;
-            flex-direction: row;
-            width: 100%;
-            
-        }
+      .namec{
+        width: 50%;
+        height: 20px;
+      }
 
-        .control > .l2 > #testeinp{
-            width: 100px;
-            position: relative;
-        }
+      .iconc{
+        width: 50%;
+      }
 
-        .control > .l2 > #testeinp::after{
-            content: "R";
-            color: white;
-            position: absolute;
-            right: -15px;
-            font-weight: bolder;
-            font-family: "Inter";
-        }
+      .sec.sec02{
+        flex-direction: row;
+      }
 
-        .control > .l2 > #testeinp::before{
-            content: "L";
-            color: white;
-            position: absolute;
-            left: -15px;
-            font-weight: bolder;
-            font-family: "Inter";
-        }
+      .panc{
+        width: 50%;
+        height: 20px;
+        display: flex;
+        flex-direction: row;
+      }
 
-        .control > .l2 > div{
-            margin-left: 30px;
-        }
+      .msc{
+        width: 50%;
+        height: 20px;
+        display: flex;
+        flex-direction: row;
+      }
 
-        .control > .l2 > div label{
-            font-size: 14px;
-            font-family: "Inter";
-            border: 1px solid #C3A364;
-            border-radius: 8px;
-            padding: 2px 12px;
-            margin: 0px 1.5px;
-            color: #C3A364;
-        }
+      .sec.sec03{
+        flex-direction: row;
+      }
 
-        .control > .l2 > div > .testecheck1L{
+      .volc{
+        height: 20px;
+        width: 100%;
+      }
 
-        }
+      /* ============== */
+
+      .name{
+        padding: 4px 0px 0px 10px;
+      }
+
+      .iconc span{
+        cursor: pointer;
+      }
+
+      .iconc{
+        display: flex;
+        justify-content: end;
+        padding: 2px 10px 0px 0px;
+      }
+
+      .panc{
+        justify-content: center;
+        align-items: center;
+      }
+
+      .l{
+        font-size: 9px;
+        padding: 0px 3px 0px 10px;
+      }
+
+      .panc input {
+        width: 75px;
+        height: 3px;
+      }
+
+      .r{
+        font-size: 8px;
+        padding: 0px 10px 0px 3px;
+      }
+
+      .msc{
+        display: flex;
+        justify-content: start;
+        align-items: center;
+        padding: 0px 0px 0px 15px;
+        gap: 4px;
+      }
+
+      .msc div{
+        background-color: #121212;
+        padding: 2px 8px;
+        width: 10px;
+        text-align: center;
+        font-size: 8px;
+        border: 1px solid #C3A364;
+        border-radius: 6px;
+        height: min-content;
+      }
+
 
     </style>
 </head>
 <body>
     <div class="control">
-        <div class="l1">
-            <div class="l10">Guitar</div>
-            <div class="l11">
-                <svg xmlns="http://www.w3.org/2000/svg" height="45px" viewBox="0 -960 960 960" width="45px" fill="#e8eaed"><path d="M240-400q-33 0-56.5-23.5T160-480q0-33 23.5-56.5T240-560q33 0 56.5 23.5T320-480q0 33-23.5 56.5T240-400Zm240 0q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm240 0q-33 0-56.5-23.5T640-480q0-33 23.5-56.5T720-560q33 0 56.5 23.5T800-480q0 33-23.5 56.5T720-400Z"/></svg>
+        <div class="sec sec01">
+            <div class="namec">
+                <p class="name">Guitar</p>
+            </div>
+            <div class="iconc">
+                <span class="material-symbols-outlined">more_horiz</span>
             </div>
         </div>
-        <div class="l2">
-                <input type="range" name="testeinp" id="testeinp">
-                <div>
-                    <label class="testecheck1L" for="testecheck1">M</label>
-                    <label class="testecheck2L" for="testecheck2">S</label>
-                    <input style="display: none;" type="checkbox" name="testecheck" id="testecheck1">
-                    <input style="display: none;" type="checkbox" name="testecheck" id="testecheck2">
-                </div>
+        <div class="sec sec02">
+            <div class="panc">
+                <div class="l">L</div>
+                <input type="range">
+                <div class="r">R</div>
+            </div>
+            <div class="msc">
+                <div class="m">M</div>
+                <div class="s">S</div>
+            </div>
         </div>
-        <div class="l3"><input type="range" name="inputvol" id="inputvol"></div>
+        <div class="sec sec03">
+            <div class="volc">
+                <input type="range">
+            </div>
+        </div>
     </div>
 </body>
 </html>
+
+
