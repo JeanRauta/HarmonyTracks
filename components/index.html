@@ -8,11 +8,11 @@
 
     <style>
         .material-symbols-outlined {
-          font-variation-settings:
-          'FILL' 0,
-          'wght' 900,
-          'GRAD' 0,
-          'opsz' 30
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 900,
+            'GRAD' 0,
+            'opsz' 30;
         }
     </style>
     
@@ -24,151 +24,244 @@
             margin: 0;
             font-family: 'Inter', sans-serif;
             transition: .1s;
-            color: #C3A364 ;
         }
 
+        .control-panel {
+            background-color: #121212;
+            width: 212px;
+            height: 75px;
+            margin: 50px 0px 0px 100px;
+            transform: scale(1.4);
+        }
 
-      .control{
-        background-color: #121212;
-        width: 250px;
-        height: 93px;
-        margin: 50px 0px 0px 100px;
-        scale: 140%;
-      }
+        .section {
+            display: flex;
+            width: 100%;
+            height: max-content;
+        }
 
-      .sec{
-        background-color: black;
-        display: flex;
-        width: 100%;
-        height: max-content;
-      }
+        .section-top {
+            padding-top: 1px;
+            flex-direction: row;
+        }
 
-      .sec.sec01{
-        flex-direction: row;
-      }
+        .control-name {
+            width: 50%;
+            height: 20px;
+        }
 
-      .namec{
-        width: 50%;
-        height: 20px;
-      }
+        .icon-container {
+            width: 50%;
+        }
 
-      .iconc{
-        width: 50%;
-      }
+        .section-middle {
+            margin-top: 2px;
+            flex-direction: row;
+        }
 
-      .sec.sec02{
-        flex-direction: row;
-      }
+        .pan-control {
+            width: 40%;
+            height: 20px;
+            display: flex;
+            flex-direction: row;
+        }
 
-      .panc{
-        width: 50%;
-        height: 20px;
-        display: flex;
-        flex-direction: row;
-      }
+        .mute-solo-controls {
+            width: 60%;
+            height: 20px;
+            display: flex;
+            flex-direction: row;
+        }
 
-      .msc{
-        width: 50%;
-        height: 20px;
-        display: flex;
-        flex-direction: row;
-      }
+        .section-bottom {
+            flex-direction: row;
+        }
 
-      .sec.sec03{
-        flex-direction: row;
-      }
+        .volume-control {
+            height: 20px;
+            width: 100%;
+        }
 
-      .volc{
-        height: 20px;
-        width: 100%;
-      }
+        /* Styling for individual elements */
 
-      /* ============== */
+        .instrument-name {
+            padding: 4px 0px 0px 12px;
+            color: #C3A364;
+        }
 
-      .name{
-        padding: 4px 0px 0px 10px;
-      }
+        .icon-container span {
+            cursor: pointer;
+            color: #C3A364;
+        }
 
-      .iconc span{
-        cursor: pointer;
-      }
+        .icon-container {
+            display: flex;
+            justify-content: end;
+            padding: 2px 10px 0px 0px;
+        }
 
-      .iconc{
-        display: flex;
-        justify-content: end;
-        padding: 2px 10px 0px 0px;
-      }
+        .pan-control {
+            align-items: center;
+        }
 
-      .panc{
-        justify-content: center;
-        align-items: center;
-      }
+        .left-indicator {
+            font-size: 9px;
+            padding: 0px 3px 0px 12px;
+            color: #fff;
+        }
 
-      .l{
-        font-size: 9px;
-        padding: 0px 3px 0px 10px;
-      }
+        .pan-control input {
+            width: 60px;
+            height: 2px;
+        }
 
-      .panc input {
-        width: 75px;
-        height: 3px;
-      }
+        .right-indicator {
+            font-size: 8px;
+            padding: 0px 10px 0px 3px;
+            color: #fff;
+        }
 
-      .r{
-        font-size: 8px;
-        padding: 0px 10px 0px 3px;
-      }
+        .mute-solo-controls {
+            display: flex;
+            justify-content: start;
+            align-items: center;
+            gap: 4px;
+            padding-left: 15px;
+        }
 
-      .msc{
-        display: flex;
-        justify-content: start;
-        align-items: center;
-        padding: 0px 0px 0px 15px;
-        gap: 4px;
-      }
+        .mute-button, .solo-button {
+            padding: 1px 9px;
+            width: 8px;
+            text-align: center;
+            font-size: 10px;
+            border: 1px solid #C3A364;
+            border-radius: 6px;
+            height: min-content;
+            cursor: pointer;
+            background-color: #121212;
+            color: #C3A364;
+        }
 
-      .msc div{
-        background-color: #121212;
-        padding: 2px 8px;
-        width: 10px;
-        text-align: center;
-        font-size: 8px;
-        border: 1px solid #C3A364;
-        border-radius: 6px;
-        height: min-content;
-      }
+        .mute-button.active, .solo-button.active {
+            background-color: #C3A364;
+            color: #121212;
+        }
 
+        .volume-control {
+            display: flex;
+            justify-content: start;
+            align-items: center;
+        }
 
+        .volume-control input {
+            margin-left: 12px;
+            margin-top: 1px;
+            height: 2px;
+            width: 75%;
+        }
+
+        /* Input styling */
+
+        .slider {
+            -webkit-appearance: none;
+            appearance: none;
+            outline: none;
+        }
+
+        .volume-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            background: linear-gradient(to right, #c5a46d 100%, #ffffff 0%);
+            outline: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 6px; 
+            height: 14px; 
+            border: 1px solid rgba(255, 255, 255, 0.322);
+            border-radius: 20%;
+            background-color: #c5a46d;
+            cursor: pointer;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            width: 14px; 
+            height: 14px;
+            border-radius: 50%;
+            background-color: #c5a46d;
+            cursor: pointer;
+            box-shadow: 0 0 2px #000;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 14px; 
+            height: 14px;
+            background-color: #c5a46d;
+            cursor: pointer;
+            box-shadow: 0 0 2px #000;
+        }
     </style>
 </head>
 <body>
-    <div class="control">
-        <div class="sec sec01">
-            <div class="namec">
-                <p class="name">Guitar</p>
+    <div class="control-panel">
+        <div class="section section-top">
+            <div class="control-name">
+                <p class="instrument-name">Guitar</p>
             </div>
-            <div class="iconc">
+            <div class="icon-container">
                 <span class="material-symbols-outlined">more_horiz</span>
             </div>
         </div>
-        <div class="sec sec02">
-            <div class="panc">
-                <div class="l">L</div>
-                <input type="range">
-                <div class="r">R</div>
+        <div class="section section-middle">
+            <div class="pan-control">
+                <div class="left-indicator">L</div>
+                <input type="range" min="-100" max="100" value="0" step="20" class="slider">
+                <div class="right-indicator">R</div>
             </div>
-            <div class="msc">
-                <div class="m">M</div>
-                <div class="s">S</div>
+            <div class="mute-solo-controls">
+                <div class="mute-button">M</div>
+                <div class="solo-button">S</div>
             </div>
         </div>
-        <div class="sec sec03">
-            <div class="volc">
-                <input type="range">
+        <div class="section section-bottom">
+            <div class="volume-control">
+                <input type="range" min="0" max="100" value="100" class="volume-slider slider">
+                <span id="volValue" style="color: #fff; margin-left: 9.5px; font-size: 7.5px;">100%</span>
             </div>
         </div>
     </div>
+    <script>
+        const panSlider = document.querySelectorAll('.slider')[0];
+        const volumeSlider = document.querySelector('.volume-slider');
+        const volValue = document.getElementById('volValue');
+        const muteSoloButtons = document.querySelectorAll('.mute-solo-controls > div');
+
+        panSlider.addEventListener('input', (event) => {
+            const value = event.target.value;
+            const panIndicators = document.querySelectorAll('.pan-control > div');
+            if (value > 0) {
+                panIndicators[1].style.color = "#c5a46d";
+            } else if (value < 0) {
+                panIndicators[0].style.color = "#c5a46d";
+            } else {
+                panIndicators[1].style.color = "#fff";
+                panIndicators[0].style.color = "#fff";
+            }
+        });
+
+        volumeSlider.addEventListener('input', (event) => {
+            const value = event.target.value;
+            volumeSlider.style.background = `linear-gradient(to right, #c5a46d ${value}%, #fff ${value}%)`;
+            volValue.textContent = `${value}%`;
+        });
+
+        muteSoloButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                button.classList.toggle('active');
+            });
+        });
+    </script>
 </body>
 </html>
-
-

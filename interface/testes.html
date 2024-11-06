@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faixas Separadas com Mudança de Tom</title>
+    <link rel="stylesheet" href="https://unpkg.com/waveform-playlist@4.2.2/styles/playlist.css">
+    <link rel="stylesheet" href="resultados.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=more_horiz" />
+    <script src="https://unpkg.com/tone@15.0.4/build/Tone.js"></script>
+    <script src="https://unpkg.com/waveform-playlist@4.2.2/build/waveform-playlist.var.min.js"></script>
+    <style>
+        .visualizer { width: 100%; height: 200px; }
+        .controls { margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Faixas Separadas (Teste)</h1>
+    <button type="button" id="btn-play" title="Play">Play</button>
+    <button type="button" id="btn-pause" title="Pause">Pause</button>
+    
+    <div class="faixas_control"></div>
+    
+    <div id="playlist"></div>
+    <canvas class="visualizer" width="800" height="200"></canvas>
+
+    <div class="controls">
+        <label for="pitch">Mudança de Tom (semitones):</label>
+        <input type="range" id="pitch" min="-24" max="24" step="1" value="0">
+        <span id="pitch-value">0</span>
+    </div>
+
+    <script>
+        var toneCtx = Tone.getContext();
+        var audioCtx = toneCtx.rawContext;
+        var analyser = audioCtx.createAnalyser();
+        var pitchShift;
+
+        // Inicializa o playlist
+        var playlist = WaveformPlaylist.init({
+            ac: audioCtx,
+            barWidth: 3,
+            barGap: 1,
+            container: document.getElementById("playlist"),
+            colors: { waveOutlineColor: '#005BBB' },
+            zoomLevels: [500, 1000, 3000, 5000],
+            samplesPerPixel: 1000,
+            waveHeight: 100,
+            isAutomaticScroll: true,
+            timescale: true,
+            state: "cursor",
+            effects: function(masterGainNode, destination, isOffline) {
+                if (!isOffline) masterGainNode.connect(analyser);
+                masterGainNode.connect(destination);
+            }
+        });
+
+        playlist.initExporter();
+        
+        // Inicializa o efeito de Pitch Shift
+        pitchShift = new Tone.PitchShift(0);
+
+        // Faixas de teste pré-definidas
+        const audioTracks = [
+            { src: './teste/bass.mp3', name: 'Audio 1' },
+            { src: './teste/drums.mp3', name: 'Audio 2' },
+            { src: './teste/guitar.mp3', name: 'Audio 1' },
+            { src: './teste/vocals.mp3', name: 'Audio 2' },
+            { src: './teste/piano.mp3', name: 'Audio 1' },
+            { src: './teste/other.mp3', name: 'Audio 2' },        ];
+
+        // Carrega as faixas na playlist
+        function carregarFaixas() {
+            const controlContainer = document.querySelector('.faixas_control');
+            controlContainer.innerHTML = ''; // Limpa o container de controles
+
+            // Adiciona as faixas à playlist e cria painel de controle para cada faixa
+            audioTracks.forEach(track => {
+                // Adiciona a faixa à playlist
+                playlist.load([{
+                    src: track.src,
+                    name: track.name,
+                    effects: function(graphEnd, masterGainNode, isOffline) {
+                        Tone.connect(graphEnd, pitchShift);
+                        Tone.connect(pitchShift, masterGainNode);
+                        return function cleanup() {}
+                    }
+                }]);
+
+                // Cria um novo painel de controle para a faixa
+                const controlPanel = document.createElement('div');
+                controlPanel.classList.add('control-panel');
+
+                controlPanel.innerHTML = `
+                    <div class="section section-top">
+                        <div class="control-name">
+                            <p class="instrument-name">${track.name}</p>
+                        </div>
+                        <div class="icon-container">
+                            <span class="material-symbols-outlined">more_horiz</span>
+                        </div>
+                    </div>
+                    <div class="section section-middle">
+                        <div class="pan-control">
+                            <div class="left-indicator">L</div>
+                            <input type="range" min="-100" max="100" value="0" step="20" class="slider pan-slider">
+                            <div class="right-indicator">R</div>
+                        </div>
+                        <div class="mute-solo-controls">
+                            <div class="mute-button">M</div>
+                            <div class="solo-button">S</div>
+                        </div>
+                    </div>
+                    <div class="section section-bottom">
+                        <div class="volume-control">
+                            <input type="range" min="0" max="100" value="100" class="volume-slider slider">
+                            <span class="vol-value" style="color: #fff; margin-left: 9.5px; font-size: 7.5px;">100%</span>
+                        </div>
+                    </div>
+                `;
+
+                // Adiciona o painel ao container
+                controlContainer.appendChild(controlPanel);
+
+                // Adiciona event listeners para o slider e botões mute/solo específicos desta faixa
+                const panSlider = controlPanel.querySelector('.pan-slider');
+                const volumeSlider = controlPanel.querySelector('.volume-slider');
+                const volValue = controlPanel.querySelector('.vol-value');
+                const muteButton = controlPanel.querySelector('.mute-button');
+                const soloButton = controlPanel.querySelector('.solo-button');
+
+                panSlider.addEventListener('input', (event) => {
+                    const value = event.target.value;
+                    const panIndicators = controlPanel.querySelectorAll('.pan-control > div');
+                    if (value > 0) {
+                        panIndicators[1].style.color = "#c5a46d";
+                    } else if (value < 0) {
+                        panIndicators[0].style.color = "#c5a46d";
+                    } else {
+                        panIndicators[1].style.color = "#fff";
+                        panIndicators[0].style.color = "#fff";
+                    }
+                });
+
+                volumeSlider.addEventListener('input', (event) => {
+                    const value = event.target.value;
+                    volumeSlider.style.background = `linear-gradient(to right, #c5a46d ${value}%, #fff ${value}%)`;
+                    volValue.textContent = `${value}%`;
+                });
+
+                muteButton.addEventListener('click', () => {
+                    muteButton.classList.toggle('active');
+                });
+
+                soloButton.addEventListener('click', () => {
+                    soloButton.classList.toggle('active');
+                });
+            });
+        }
+
+        carregarFaixas();
+
+        document.getElementById("btn-play").addEventListener("click", function() {
+            playlist.play();
+        });
+
+        document.getElementById("btn-pause").addEventListener("click", function() {
+            playlist.pause();
+        });
+
+        document.getElementById("pitch").addEventListener("input", function() {
+            pitchShift.pitch = parseFloat(this.value);
+            document.getElementById("pitch-value").textContent = this.value;
+        });
+    </script>
+</body>
+</html>

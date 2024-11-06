@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Faixas Separadas com Mudança de Tom</title>
     <link rel="stylesheet" href="https://unpkg.com/waveform-playlist@4.2.2/styles/playlist.css">
+    <link rel="stylesheet" href="resultados.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=more_horiz" />
     <script src="https://unpkg.com/tone@15.0.4/build/Tone.js"></script>
     <script src="https://unpkg.com/waveform-playlist@4.2.2/build/waveform-playlist.var.min.js"></script>
     <style>
@@ -14,12 +16,11 @@
 </head>
 <body>
     <h1>Faixas Separadas</h1>
-    <button type="button" id="btn-play" title="Play">
-        Play
-    </button>
-    <button type="button" id="btn-pause" title="Pause">
-        Pause
-    </button>
+    <button type="button" id="btn-play" title="Play">Play</button>
+    <button type="button" id="btn-pause" title="Pause">Pause</button>
+    
+    <div class="faixas_control"></div>
+    
     <div id="playlist"></div>
     <canvas class="visualizer" width="800" height="200"></canvas>
 
@@ -42,7 +43,6 @@
             barGap: 1,
             container: document.getElementById("playlist"),
             colors: { waveOutlineColor: '#005BBB' },
-            controls: { show: true, width: 200 },
             zoomLevels: [500, 1000, 3000, 5000],
             samplesPerPixel: 1000,
             waveHeight: 100,
@@ -56,10 +56,10 @@
         });
 
         playlist.initExporter();
-
+        
         // Inicializa o efeito de Pitch Shift
         pitchShift = new Tone.PitchShift(0);
-        
+
         // Carrega as faixas na playlist
         async function carregarFaixas() {
             const token = sessionStorage.getItem('token');
@@ -73,20 +73,92 @@
             const result = await response.json();
             if (result.dados && result.dados.faixas_separadas) {
                 const audioTags = result.dados.faixas_separadas.audio_tags;
+                const controlContainer = document.querySelector('.faixas_control');
 
-                // Adiciona as faixas à playlist com o efeito de Pitch Shift
+                // Limpa o container de controles caso já tenha sido populado
+                controlContainer.innerHTML = '';
+
+                // Adiciona as faixas à playlist e cria painel de controle para cada faixa
                 audioTags.forEach(track => {
+                    // Adiciona a faixa à playlist
                     playlist.load([{
                         src: track.src,
                         name: track.name,
                         effects: function(graphEnd, masterGainNode, isOffline) {
                             Tone.connect(graphEnd, pitchShift);
                             Tone.connect(pitchShift, masterGainNode);
-                            return function cleanup() {
-                                // Não desconectar pitchShift aqui
-                            }
+                            return function cleanup() {}
                         }
                     }]);
+
+                    // Cria um novo painel de controle para a faixa
+                    const controlPanel = document.createElement('div');
+                    controlPanel.classList.add('control-panel');
+
+                    controlPanel.innerHTML = `
+                        <div class="section section-top">
+                            <div class="control-name">
+                                <p class="instrument-name">${track.name}</p>
+                            </div>
+                            <div class="icon-container">
+                                <span class="material-symbols-outlined">more_horiz</span>
+                            </div>
+                        </div>
+                        <div class="section section-middle">
+                            <div class="pan-control">
+                                <div class="left-indicator">L</div>
+                                <input type="range" min="-100" max="100" value="0" step="20" class="slider pan-slider">
+                                <div class="right-indicator">R</div>
+                            </div>
+                            <div class="mute-solo-controls">
+                                <div class="mute-button">M</div>
+                                <div class="solo-button">S</div>
+                            </div>
+                        </div>
+                        <div class="section section-bottom">
+                            <div class="volume-control">
+                                <input type="range" min="0" max="100" value="100" class="volume-slider slider">
+                                <span class="vol-value" style="color: #fff; margin-left: 9.5px; font-size: 7.5px;">100%</span>
+                            </div>
+                        </div>
+                    `;
+
+                    // Adiciona o painel ao container
+                    controlContainer.appendChild(controlPanel);
+
+                    // Adiciona event listeners para o slider e botões mute/solo específicos desta faixa
+                    const panSlider = controlPanel.querySelector('.pan-slider');
+                    const volumeSlider = controlPanel.querySelector('.volume-slider');
+                    const volValue = controlPanel.querySelector('.vol-value');
+                    const muteButton = controlPanel.querySelector('.mute-button');
+                    const soloButton = controlPanel.querySelector('.solo-button');
+
+                    panSlider.addEventListener('input', (event) => {
+                        const value = event.target.value;
+                        const panIndicators = controlPanel.querySelectorAll('.pan-control > div');
+                        if (value > 0) {
+                            panIndicators[1].style.color = "#c5a46d";
+                        } else if (value < 0) {
+                            panIndicators[0].style.color = "#c5a46d";
+                        } else {
+                            panIndicators[1].style.color = "#fff";
+                            panIndicators[0].style.color = "#fff";
+                        }
+                    });
+
+                    volumeSlider.addEventListener('input', (event) => {
+                        const value = event.target.value;
+                        volumeSlider.style.background = `linear-gradient(to right, #c5a46d ${value}%, #fff ${value}%)`;
+                        volValue.textContent = `${value}%`;
+                    });
+
+                    muteButton.addEventListener('click', () => {
+                        muteButton.classList.toggle('active');
+                    });
+
+                    soloButton.addEventListener('click', () => {
+                        soloButton.classList.toggle('active');
+                    });
                 });
             } else {
                 alert('Erro ao obter os dados da sessão.');
@@ -94,16 +166,14 @@
         }
 
         carregarFaixas().then(() => {
-            // Adiciona eventos de clique aos botões
             document.getElementById("btn-play").addEventListener("click", function() {
-                playlist.play(); // Inicia a reprodução da playlist
+                playlist.play();
             });
 
             document.getElementById("btn-pause").addEventListener("click", function() {
-                playlist.pause(); // Pausa a reprodução da playlist
+                playlist.pause();
             });
 
-            // Adiciona eventos para sliders
             document.getElementById("pitch").addEventListener("input", function() {
                 pitchShift.pitch = parseFloat(this.value);
                 document.getElementById("pitch-value").textContent = this.value;
@@ -128,3 +198,36 @@
     </script>
 </body>
 </html>
+
+
+document.querySelectorAll('.mute-btn').forEach(function(button) {
+    button.addEventListener('click', function() {
+        var trackIndex = this.getAttribute('data-track');
+        ee.emit('mute', playlist.tracks[trackIndex]);
+        this.classList.toggle('active');
+    });
+});
+
+document.querySelectorAll('.solo-btn').forEach(function(button) {
+    button.addEventListener('click', function() {
+        var trackIndex = this.getAttribute('data-track');
+        ee.emit('solo', playlist.tracks[trackIndex]);
+        this.classList.toggle('active');
+    });
+});
+
+document.querySelectorAll('.volume-slider').forEach(function(inp) {
+    inp.addEventListener('input', function() {
+        var trackIndex = this.getAttribute('data-track');
+        var volume = parseFloat(this.value);
+        ee.emit('volumechange', volume, playlist.tracks[trackIndex]);
+    });
+});
+
+document.querySelectorAll('.pan-slider').forEach(function(inp) {
+    inp.addEventListener('input', function() {
+        var trackIndex = this.getAttribute('data-track');
+        var pan = parseFloat(this.value);
+        ee.emit('stereopan', pan, playlist.tracks[trackIndex]);
+    });
+});

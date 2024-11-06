@@ -58,7 +58,7 @@ def separar_faixas():
             elif selected_model == "d4":
                 separator = demucs.api.Separator(model="htdemucs_ft", progress=True, device='cuda', jobs=2)
             elif selected_model == "d2":
-                separator = demucs.api.Separator(model="htdemucs_ft", progress=True, device='cuda', jobs=2)
+                separator = demucs.api.Separator(model="htdemucs", progress=True, device='cuda', jobs=2)
             else:
                 return jsonify({"error": "Modelo não suportado."}), 400
 
