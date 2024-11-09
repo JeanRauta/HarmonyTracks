@@ -41,7 +41,7 @@ def convert_to_midi():
             s3_key = f"{hash_name}/{midi_filename}"  
             s3_client.upload_file(temp_midi_file.name, S3_BUCKET, s3_key)
 
-            s3_link = f"https://{S3_BUCKET}.s3.amazonaws.com/{s3_key}"
+            s3_link = f"https://d2vdn8oszh8rp9.cloudfront.net/{s3_key}"
 
             return jsonify({"midi_file_link": s3_link}), 200
 

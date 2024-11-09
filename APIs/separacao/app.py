@@ -15,7 +15,6 @@ app = Flask(__name__)
 CORS(app)
 
 
-
 S3_BUCKET = 'htracks'  
 
 @app.route('/separar-faixas', methods=['POST'])
@@ -78,7 +77,7 @@ def separar_faixas():
                 s3_key = f"{unique_folder_name}/{sanitized_source_name}.mp3"
                 s3_client.upload_file(output_mp3_path, S3_BUCKET, s3_key)
 
-                s3_link = f"https://{S3_BUCKET}.s3.amazonaws.com/{s3_key}"
+                s3_link = f"https://d2vdn8oszh8rp9.cloudfront.net/{s3_key}"
                 audio_tags.append({'src': s3_link, 'name': sanitized_source_name})
 
             response_data = {

@@ -16,12 +16,13 @@
     transition: .1s;
 }
 
-.control-panel {
+.track-controls {
     background-color: #121212;
+    background-image: linear-gradient(to right, #121212 60%, #1D1D1D);
     width: 212px;
     height: 75px;
-    margin: 50px 0px 0px 100px;
-    transform: scale(1.4);
+    margin: 10px 10px 0px 0px;
+    transform: scale(1.05);
 }
 
 .section {
@@ -116,7 +117,7 @@
     justify-content: start;
     align-items: center;
     gap: 4px;
-    padding-left: 15px;
+    margin-left: 15px;
 }
 
 .mute-button, .solo-button {
@@ -130,6 +131,11 @@
     cursor: pointer;
     background-color: #121212;
     color: #C3A364;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    flex-wrap: nowrap;
 }
 
 .mute-button.active, .solo-button.active {
