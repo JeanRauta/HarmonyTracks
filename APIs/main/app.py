@@ -84,9 +84,9 @@ def separar_faixas():
 
         try:
             if audio_file:
-                response = requests.post('http://localhost:5001/separar-faixas', files={'file': audio_file}, data={'model': model})
+                response = requests.post('http://35.209.77.147:8080/separar-faixas', files={'file': audio_file}, data={'model': model})
             elif url:
-                response = requests.post('http://localhost:5001/separar-faixas', data={'url': url, 'model': model})
+                response = requests.post('http://35.209.77.147:8080/separar-faixas', data={'url': url, 'model': model})
             else:
                 return jsonify({"error": "Nenhum arquivo ou URL fornecido"}), 400
 
