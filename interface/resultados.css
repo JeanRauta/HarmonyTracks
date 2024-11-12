@@ -20,6 +20,7 @@ main{
     display: flex;
     justify-content: left;
     width: 92%;
+    margin-bottom: 100px;
 }
 
 .track-controls {
@@ -57,7 +58,7 @@ main{
 }
 
 .pan-control {
-    width: 16%;
+    width: 40%;
     height: 20px;
     display: flex;
     flex-direction: row;
@@ -226,5 +227,19 @@ main{
         background-image: none;
     }
 
+    .pan-control {
+        width: 90px;
+        height: 20px;
+        display: flex;
+        flex-direction: row;
+    }
+
+    .mute-solo-controls {
+        display: flex;
+        justify-content: start;
+        align-items: center;
+        gap: 4px;
+        margin-left: 15px;
+    }
 
 }
