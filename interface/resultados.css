@@ -16,6 +16,12 @@
     transition: .1s;
 }
 
+main{
+    display: flex;
+    justify-content: left;
+    width: 92%;
+}
+
 .track-controls {
     background-color: #121212;
     background-image: linear-gradient(to right, #121212 60%, #1D1D1D);
@@ -51,7 +57,7 @@
 }
 
 .pan-control {
-    width: 40%;
+    width: 16%;
     height: 20px;
     display: flex;
     flex-direction: row;
@@ -197,4 +203,28 @@
     background-color: #c5a46d;
     cursor: pointer;
     box-shadow: 0 0 2px #000;
+}
+
+
+@media (max-width: 768px) {
+    main{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #faixas{
+        display: none;
+    }
+    #track-controls{
+        width: 85%;
+    }
+
+    .track-controls{
+        width: 100%;
+        background-color: #121212;
+        background-image: none;
+    }
+
+
 }
