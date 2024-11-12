@@ -101,6 +101,7 @@ main {
     color: #C3A364;
     justify-content: space-between;
     padding: 22.5px 18px;
+    height: 64px;
 }
 
 .flex-direction {
@@ -121,6 +122,7 @@ main {
     margin-bottom: 22.5px;
     margin-right: 10px;
 }
+
 .options-toggle:hover {
     background-color: #222222c7;
 }
@@ -146,7 +148,7 @@ main {
 }
 .advanced-options-content {
     opacity: 0;
-    visibility: hidden;
+    display: none;
     transform: translate(0px, -15px);
     margin: 15px 0px 0px 37.5px;
 }
@@ -189,7 +191,6 @@ main {
     color: white;
 }
 
-/* Estilos do botão de envio */
 .submit-button {
     background-color: #1a1a1a;
     border-radius: 18px;
@@ -234,7 +235,7 @@ main {
     }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 520px) {
     main {
         padding-top: 10px;
         width: 95vw;
@@ -252,5 +253,41 @@ main {
     .file-button, .options-toggle, .submit-button {
         padding: 0.75rem 1rem;
         font-size: 14px;
+    }
+
+    .advanced-options {
+        display: flex;
+        flex-direction: column;
+        color: #C3A364;
+        justify-content: space-between;
+        padding: 22.5px 18px;
+        height: 64px;
+    }
+
+    .options-toggle {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        background-color: #1a1a1a;
+        width: 100%; /* largura ajustável */
+        max-width: 100%; /* limite para dispositivos maiores */
+        padding: 9px 39px 9px 18px;
+        border-radius: 18px;
+        cursor: pointer;
+        margin-bottom: 22.5px;
+        margin-right: 10px;
+    }
+
+    .submit-button {
+        background-color: #1a1a1a;
+        border-radius: 18px;
+        cursor: pointer;
+        padding: 12px 4.5px;
+        text-transform: uppercase;
+        height: min-content;
+        width: 100%;
+        max-width: 100%;
+        text-align: center;
+        margin-left: 0px;
     }
 }
