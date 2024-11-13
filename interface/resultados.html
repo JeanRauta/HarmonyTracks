@@ -195,17 +195,17 @@
 
                     document.querySelectorAll('.mute-button').forEach(function(button) {
                         button.addEventListener('click', function() {
+                            button.classList.toggle('active');
                             var trackIndex = this.getAttribute('data-track');
                             ee.emit('mute', playlist.tracks[trackIndex]);
-                            this.classList.toggle('active');
                         });
                     });
 
                     document.querySelectorAll('.solo-button').forEach(function(button) {
                         button.addEventListener('click', function() {
+                            button.classList.toggle('active');
                             var trackIndex = this.getAttribute('data-track');
                             ee.emit('solo', playlist.tracks[trackIndex]);
-                            this.classList.toggle('active');
                         });
                     });
 
