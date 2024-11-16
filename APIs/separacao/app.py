@@ -15,6 +15,7 @@ app = Flask(__name__)
 CORS(app)
 
 
+
 S3_BUCKET = 'htracks'  
 
 @app.route('/separar-faixas', methods=['POST'])

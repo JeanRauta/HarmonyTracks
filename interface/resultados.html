@@ -7,15 +7,30 @@
     <link rel="stylesheet" href="https://unpkg.com/waveform-playlist@4.2.2/styles/playlist.css">
     <link rel="stylesheet" href="./style/icons.css">
     <link rel="stylesheet" href="./style/audios.css">
-    <link rel="stylesheet" href="resultados.css">
+    <link rel="stylesheet" href="style/resultados.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
 </head>
 <body>
+
     <header>
         <a onclick="goBackAndClose()">
             <i class="gg-chevron-left"></i>
             <h1>HarmonyTracks</h1>
         </a>
+        <button class="baixar" onclick="toggleMenu()">Exportar</button>
+        
+        <div id="menuDropdown" class="menu-dropdown">
+            <div onclick="baixarFaixasSeparadas()">Baixar Faixas Separadas</div>
+            <div onclick="baixarPlaybackVocal()">Baixar Playback Vocal</div>
+            <p>Backingtracks</p>
+            <div style="padding-left: 20px;" onclick="baixarBackintrack('guitar')">backingtrack Guitar</div>
+            <div style="padding-left: 20px;" onclick="baixarBackintrack('piano')">backingtrack Piano</div>
+            <div style="padding-left: 20px;" onclick="baixarBackintrack('drum')">backingtrack Drum</div>
+            <div style="padding-left: 20px;" onclick="baixarBackintrack('bass')">backingtrack Bass</div>
+            <div style="padding-left: 20px;" onclick="baixarBackintrack('other')">backingtrack Other</div>
+            <div onclick="baixarMix()">Baixar Mix</div>
+        </div>
     </header>
     <main>
         <div id="track-controls">
@@ -23,12 +38,13 @@
         </div>
         <div id="faixas">
             <div id="playlist"></div>
-            <div class="checkAlign">
+            <!-- <div class="checkAlign">
                 <input type="checkbox" name="auto" id="auto">
                 <label style="color: white;" for="auto">Seguir</label>
-            </div>
+            </div> -->
         </div>
     </main>
+    
 
     <div class="controls">
         <div>
@@ -43,6 +59,9 @@
 
     <script src="https://unpkg.com/waveform-playlist@4.2.2/build/waveform-playlist.var.min.js"></script>
     <script>
+
+        let audioTags
+
         function goBackAndClose() {
             window.history.back();
             window.close();
@@ -50,7 +69,7 @@
 
         async function carregarFaixas() {
             const token = sessionStorage.getItem('token');
-            const response = await fetch('https://harmonytracks.onrender.com/api/dados-sessao', {
+            const response = await fetch('http://localhost:5000/api/dados-sessao', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -59,7 +78,7 @@
 
             const result = await response.json();
             if (result.dados && result.dados.faixas_separadas) {
-                const audioTags = result.dados.faixas_separadas.audio_tags;
+                audioTags = result.dados.faixas_separadas.audio_tags;
                 document.getElementById('filename').textContent = "Faixas Locais";
 
                 const audioData = audioTags.map(track => ({
@@ -186,37 +205,63 @@
 
                         muteButton.addEventListener('click', () => {
                             muteButton.classList.toggle('active');
+                            const trackIndex = muteButton.getAttribute('data-track');
+                            ee.emit('mute', playlist.tracks[trackIndex]);
                         });
 
                         soloButton.addEventListener('click', () => {
                             soloButton.classList.toggle('active');
-                        });
-                    });
-
-                    document.querySelectorAll('.mute-button').forEach(function(button) {
-                        button.addEventListener('click', function() {
-                            button.classList.toggle('active');
-                            var trackIndex = this.getAttribute('data-track');
-                            ee.emit('mute', playlist.tracks[trackIndex]);
-                        });
-                    });
-
-                    document.querySelectorAll('.solo-button').forEach(function(button) {
-                        button.addEventListener('click', function() {
-                            button.classList.toggle('active');
-                            var trackIndex = this.getAttribute('data-track');
+                            const trackIndex = soloButton.getAttribute('data-track');
                             ee.emit('solo', playlist.tracks[trackIndex]);
                         });
+
+                        document.querySelectorAll('.icon-container').forEach((icon, index) => {
+                            icon.addEventListener('click', function (event) {
+                                event.stopPropagation(); 
+
+                                let existingMenu = document.querySelector('.menu-flutuante');
+                                if (existingMenu) {
+                                    existingMenu.remove();
+                                }
+
+                                let menu = document.createElement('div');
+                                menu.className = 'menu-flutuante';
+                                menu.innerHTML = `
+                                    <div class="opcao opcbaixar" data-src="${audioData[index].src}">Baixar</div>
+                                    <div class="opcao opcmidi">Converter para midi</div>
+                                `;
+                                document.body.appendChild(menu);
+
+                                const rect = icon.getBoundingClientRect();
+                                menu.style.top = `${rect.top + window.scrollY}px`;
+                                menu.style.left = `${rect.right + 10}px`;
+                                menu.style.display = 'block';
+
+                                menu.querySelector('.opcbaixar').addEventListener('click', function () {
+                                    const faixaSrc = this.getAttribute('data-src'); 
+                                    baixarFaixa(faixaSrc); 
+                                });
+                            });
+                        });
                     });
+
+                    function baixarFaixa(src) {
+                        const link = document.createElement('a');
+                        link.href = src;
+                        link.download = src.split('/').pop();  
+                        link.click();
+                    }
+
+
 
                     document.getElementById('master-volume').addEventListener('input', function() {
                         var volume = parseFloat(this.value)
                         ee.emit('mastervolumechange', volume);
                     });
 
-                    document.getElementById('auto').addEventListener('change', function() {
-                        ee.emit("automaticscroll", this.checked);
-                    });
+                    // document.getElementById('auto').addEventListener('change', function() {
+                    //     ee.emit("automaticscroll", this.checked);
+                    // });
 
                     document.querySelectorAll('.volume-slider').forEach(function(inp) {
                         inp.addEventListener('input', function() {
@@ -233,6 +278,15 @@
                             ee.emit('stereopan', pan, playlist.tracks[trackIndex]);
                         });
                     });
+
+        
+
+                document.addEventListener('click', function(event) {
+                    const menu = document.querySelector('.menu-flutuante');
+                    if (menu && !menu.contains(event.target) && !event.target.classList.contains('icon-container')) {
+                        menu.remove();
+                    }
+                });
                 });
             }
         }
@@ -240,7 +294,7 @@
         async function renovarToken() {
             const token = sessionStorage.getItem('token');
             if (token) {
-                await fetch('https://harmonytracks.onrender.com/api/renovar-token', {
+                await fetch('http://localhost:5000/api/renovar-token', {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -252,6 +306,102 @@
 
         setInterval(renovarToken, 5000);
         carregarFaixas();
+
+ function toggleMenu() {
+            const menu = document.getElementById('menuDropdown');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        }
+
+function baixarFaixasSeparadas() {
+    enviarDadosParaApi("baixarFaixasSeparadas");
+}
+
+function baixarPlaybackVocal() {
+    enviarDadosParaApi("baixarPlaybackVocal");
+}
+
+function baixarBackintrack(tipo) {
+    enviarDadosParaApi(`baixarBackintrack${tipo}`);
+}
+
+function baixarMix() {
+    enviarDadosParaApi("baixarMix");
+}
+
+async function enviarDadosParaApi(extraString) {
+    const estadosFaixas = [];
+    const faixas = document.querySelectorAll('.track-controls');
+
+    faixas.forEach((faixa, index) => {
+        const volumeSlider = faixa.querySelector('.volume-slider');
+        const volume = volumeSlider ? parseFloat(volumeSlider.value) : 100;
+
+        const muteButton = faixa.querySelector('.mute-button');
+        const isMute = muteButton ? muteButton.classList.contains('active') : false;
+
+        const soloButton = faixa.querySelector('.solo-button');
+        const isSolo = soloButton ? soloButton.classList.contains('active') : false;
+
+        const audioSrc = audioTags[index].src;
+
+        estadosFaixas.push({
+            audioSrc: audioSrc,
+            volume: isMute ? 0 : volume,
+            isMute: isMute,
+            isSolo: isSolo
+        });
+    });
+
+    const payload = {
+        "Estado das Faixas": estadosFaixas,
+        "extraString": extraString
+    };
+
+    try {
+        const response = await fetch("http://localhost:5004/upload", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+    const blob = await response.blob();
+    const contentDisposition = response.headers.get("Content-Disposition");
+    const filename = contentDisposition 
+        ? contentDisposition.split("filename=")[1]?.replace(/"/g, '') 
+        : "download";
+
+    const downloadUrl = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = downloadUrl;
+    a.download = filename; 
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(downloadUrl);
+} else {
+    const errorData = await response.json();
+    console.error("Erro ao baixar arquivo:", errorData.error);
+    alert("Erro ao realizar o download: " + errorData.error);
+}
+
+    } catch (error) {
+        console.error("Erro na conexão com a API:", error);
+        alert("Erro ao conectar-se à API.");
+    }
+}
+
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('menuDropdown');
+            if (!menu.contains(event.target) && event.target !== document.querySelector('.baixar')) {
+                menu.style.display = 'none';
+            }
+        });
+
+                
     </script>
 </body>
 </html>

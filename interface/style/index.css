@@ -1,184 +1,322 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
+/* Configuração de estilos básicos */
 * {
-    color: #C3A364;
-    margin: 0;
     padding: 0;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    box-sizing: border-box;
+    transition: .1s;
 }
-
-body{
+body {
     background-color: #121212;
-}
-
-header {
-    height: 60px;
-}
-
-.div-logo {
-    font-size: x-large;
-    padding: 20px;
-    font-weight: 400;
-}
-
-.flex {
+    height: 100vh;
     display: flex;
-    flex-direction: column;
-    align-content: center;
-    flex-wrap: nowrap;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    height: 70%;
-    width: 100vw;
+    overflow-x: hidden;
 }
-
-.h2_tittle {
-    margin-bottom: 20px;
-    margin-top: 100px;
-    text-align: center;
-    font-weight: 400;
-}
-
 main {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    align-content: center;
-    align-items: center;
-    height: 900px;
+    padding-top: calc(2vh + 20px); /* padding dinâmico para ajustar em diferentes tamanhos de tela */
+    width: 90vw; /* aumenta ou diminui conforme a largura da tela */
+    max-width: 800px; /* limite de largura para grandes telas */
+    min-width: 320px; /* limite mínimo para evitar colapsos */
+    margin: auto;
+    height: auto;
+    padding-bottom: 20px;
+
 }
 
-.input-file {
-    background-color: rgba(88, 88, 88, 0.219);
-    width: 250px;
-    height: 50px;
+/* Estilos do menu de seleção */
+.tab-menu ul {
+    cursor: pointer;
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.tab-menu-item {
+    padding: 1rem 3rem;
+    color: rgba(255, 255, 255, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    transition: .2s;
+    width: 50%;
+    text-align: center;
+}
+
+.tab-menu-item.active {
+    color: #C3A364;
+    border-bottom: 1px solid #C3A364;
+}
+
+/* Estilos da área de upload */
+.upload-section {
+    display: block;
+}
+#file-dropzone {
+    margin-top: 20px;
+    color: #C3A364;
+    padding: 1.5rem;
+    background-color: #151515;
+    border-radius: 1rem;
+    border: 2px dashed #c3a36454;
+    display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    border-radius: 5px;
-    font-size: large;
-    cursor: pointer;
+    max-width: 100%;
+}
+#file-dropzone > p {
+    padding: 15px 0px 25px 0px;
+}
+#file-dropzone > pre {
+    transform: translate(0px, -22.5px);
+    font-size: medium;
+    width: min-content;
+    height: 18px;
+    overflow: hidden;
 }
 
-.suporte {
+#file-dropzone .input-wrapper {
+    padding: 15px 0px 45px 0px;
+}
+#file-dropzone .file-button {
+    background-color: #1a1a1a;
+    padding: 18px 15px;
+    border-radius: 18px;
+    cursor: pointer;
+    max-width: 200px; /* para manter a largura adequada em telas menores */
+}
+#file-dropzone .file-button:hover {
+    background-color: #222222c7;
+}
+.file-support-info {
+    margin: 27px 0px 0px 15px;
+    font-size: calc(12px + 0.1vw);
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* Estilos de opções avançadas */
+.advanced-options {
     display: flex;
     flex-direction: row;
-    flex-wrap: nowrap;
-    align-content: center;
+    color: #C3A364;
+    justify-content: space-between;
+    padding: 22.5px 18px;
+    height: 64px;
+}
+
+.flex-direction {
+    display: flex;
+    flex-direction: column;
+}
+
+.options-toggle {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background-color: #1a1a1a;
+    width: 243px; 
+    max-width: 270px;
+    padding: 9px 45px 9px 45px;
+    border-radius: 18px;
+    cursor: pointer;
+    margin-bottom: 22.5px;
+    margin-right: 10px;
+    position: relative;
+    text-align: center;
+}
+
+.options-toggle:hover {
+    background-color: #222222c7;
+}
+.options-toggle .arrow-icon {
+    color: #C3A364;
+    padding-right: 15px;
+    rotate: -90deg;
+    transform: translate(7.5px, -4.5px);
+    translate: -0% -50%;
+    position: absolute;
+    top: 50%;
+    left: 10px;
+}
+.options-toggle.active .arrow-icon {
+    rotate: 0deg;
+    transform: translate(0px, 0px);
+}
+#model-select {
+    margin: 14px 0px;
+    color: #C3A364;
+    background-color: #121212;
+    border: 1px solid #C3A364;
+    padding: 6px 3px;
+    border-radius: 9px;
+    width: 100%;
+    max-width: 235px;
+}
+.advanced-options-content {
+    opacity: 0;
+    display: none;
+    transform: translate(0px, -15px);
+    margin: 15px 0px 0px 37.5px;
+}
+.advanced-options-content.active {
+    opacity: 1;
+    display: block;
+    visibility: visible;
+    transform: translate(0px);
+}
+
+/* Estilos do campo de URL */
+.url-section {
+    display: none;
+}
+#url-input-container {
+    margin-top: 30px;
+    color: #C3A364;
+    padding: 52.5px 0px;
+    background-color: #151515;
+    border-radius: 27px;
+    display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    font-size: smaller;
-    color: #636363;
+    max-width: 100%;
 }
-
-.file-name {
-    width: 250px;
-    margin-top: 20px;
-    font-size: 16px;
-}
-
-.env-file {
-    background-color: rgba(131, 131, 131, 0.301);
-    border: none;
-    width: 250px;
-    height: 30px;
-    border: 1.5px solid rgba(0, 0, 0, 0.26);
-    transition: .1s;
-
-}
-
-.env-file:hover {
-    background-color: rgba(255, 228, 196, 0.774);
-    cursor: pointer;
-    color: #121212;
-}
-
 .form-flex {
+    width: 85%;
     display: flex;
+    flex-direction: column;
 }
-
-.url-input:focus {
-    padding-left: 10px;
-    width: 700px;
-    height: 23px;
-    color: #121212;
-    border-collapse: collapse;
-    border-radius: 4px 0px 0px 4px;
-    border: 1px solid rgba(0, 0, 0, 0.39);
-    background-color: rgb(240, 248, 255);
-}
-
 .url-input {
-    padding-left: 10px;
-    width: 700px;
-    height: 23px;
-    color: #121212;
-    border-collapse: collapse;
-    border-radius: 4px 0px 0px 4px;
-    border: 1px solid rgba(0, 0, 0, 0.39);
-    background-color: rgba(240, 248, 255, 0.603);
+    width: calc(100% - 20px); /* largura relativa */
+    background-color: transparent;
+    border: 2px solid #343434;
+    border-radius: 3px;
+    height: 42px;
+    font-size: calc(15px + 0.2vw);
+    padding-left: 15px;
+    color: white;
 }
 
-.env-url {
-    background-color: rgba(109, 109, 109, 0.226);
-    border: none;
-    width: 60px;
-    height: 25px;
-    font-size: small;
-    border-radius: 0px 4px 4px 0px;
-    border: 1px solid rgba(0, 0, 0, 0.527);
-    border-collapse: collapse;
-    transition: .1s;
-}
-
-.env-url:hover {
+.submit-button {
+    background-color: #1a1a1a;
+    border-radius: 18px;
     cursor: pointer;
-    background-color: rgba(255, 228, 196, 0.774);
-    color: #121212;
+    height: min-content;
+    width: 100%;
+    max-width: 175px;
+    text-align: center;
+    margin-left: 10px;
+    padding: 9px 45px 9px 45px;
+    margin-bottom: 100px;
 }
 
-#file-input-container {
-    border: 1.5px dashed #838383;
+.submit-button:hover {
+    background-color: #222222c7;
+}
+
+/* Loader */
+#loading {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 30px;
     border-radius: 15px;
-    padding: 10px;
+    font-size: 27px;
+    width: 100vw;
+    height: 100vh;
     display: flex;
-    justify-content: space-around;
-    align-content: center;
-    flex-wrap: nowrap;
-    flex-direction: column;
+    text-align: center;
+    justify-content: center;
     align-items: center;
-    height: 300px;
-    width: 972px;
-    margin: auto;
+    align-content: center;
 }
 
-#file-input-container.highlight {
-    border: 2px dotted green;
+/* Breakpoints para responsividade */
+@media (max-width: 768px) {
+    .tab-menu-item {
+        padding: 1rem 1.5rem;
+    }
 }
 
-.config-model {
-    display: flex;
-    flex-direction: column;
-    margin: auto;
-    margin-top: 20px;
-    width: 972px;
-}
+@media (max-width: 520px) {
+    main {
+        padding-top: 50px;
+        width: 95vw;
+        padding-bottom: 100px;
+    }
 
-#model{
-    background-color: #121212;
-    margin: 5px;
-    margin-top: 25px;
-    border: 1px solid #C3A364;
-    color: #C3A364;
-    padding-left: 2px;
-    font-weight: 400;
-    border-radius: 2px;
-    width: 170px;
-    padding-left: 10px;
-    transition: 0.3s;
-    height: 30px;
-    outline: none;
-}
+    .tab-menu-item {
+        padding: 0.5rem 1rem;
+        font-size: 14px;
+    }
 
+    #file-dropzone {
+        padding: 1rem;
+    }
+
+    .file-button, .options-toggle, .submit-button {
+        padding: 0.75rem 1rem;
+        font-size: 14px;
+    }
+
+    .advanced-options {
+        display: flex;
+        flex-direction: column;
+        color: #C3A364;
+        justify-content: space-between;
+        padding: 22.5px 18px;
+        height: 64px;
+        margin-bottom: 100px;
+    }
+
+    .options-toggle {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        background-color: #1a1a1a;
+        width: 100%;
+        max-width: 100%;
+        border-radius: 18px;
+        cursor: pointer;
+        margin-bottom: 22.5px;
+        margin-right: 10px;
+        justify-content: center;
+        
+    }
+
+    .submit-button {
+        background-color: #1a1a1a;
+        border-radius: 18px;
+        cursor: pointer;
+        padding: 12px 4.5px;
+        height: min-content;
+        width: 100%;
+        max-width: 100%;
+        text-align: center;
+        margin-left: 0px;
+    }
+
+    .advanced-options-content {
+        display: flex;
+        opacity: 0;
+        display: none;
+        transform: translate(0px, -15px);
+        margin: auto;
+    }
+
+    #model-select {
+        margin: 14px 0px;
+        color: #C3A364;
+        background-color: #121212;
+        border: 1px solid #C3A364;
+        padding: 6px 3px;
+        border-radius: 9px;
+        width: 100%;
+        max-width: 235px;
+    }
+}

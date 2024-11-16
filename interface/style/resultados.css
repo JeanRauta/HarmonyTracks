@@ -1,0 +1,245 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+   
+
+.material-symbols-outlined {
+    font-variation-settings:
+    'FILL' 0,
+    'wght' 900,
+    'GRAD' 0,
+    'opsz' 30;
+}
+
+* {
+    padding: 0;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    transition: .1s;
+}
+
+main{
+    display: flex;
+    justify-content: left;
+    width: 92%;
+    margin-bottom: 100px;
+}
+
+.track-controls {
+    background-color: #191919;
+    /* background-image: linear-gradient(to right, #121212 60%, #1D1D1D); */
+    width: 212px;
+    height: 75px;
+    margin: 10px 10px 0px 0px;
+    transform: scale(1.05);
+}
+
+.section {
+    display: flex;
+    width: 100%;
+    height: max-content;
+}
+
+.section-top {
+    padding-top: 1px;
+    flex-direction: row;
+}
+
+.control-name {
+    width: 50%;
+    height: 20px;
+}
+
+.icon-container {
+    width: 50%;
+}
+
+.section-middle {
+    margin-top: 2px;
+    flex-direction: row;
+}
+
+.pan-control {
+    width: 40%;
+    height: 20px;
+    display: flex;
+    flex-direction: row;
+}
+
+.mute-solo-controls {
+    width: 60%;
+    height: 20px;
+    display: flex;
+    flex-direction: row;
+}
+
+.section-bottom {
+    flex-direction: row;
+}
+
+.volume-control {
+    height: 20px;
+    width: 100%;
+}
+
+/* Styling for individual elements */
+
+.instrument-name {
+    padding: 4px 0px 0px 12px;
+    color: #C3A364;
+}
+
+.icon-container span {
+    cursor: pointer;
+    color: #C3A364;
+}
+
+.icon-container {
+    display: flex;
+    justify-content: end;
+    padding: 2px 10px 0px 0px;
+}
+
+.pan-control {
+    align-items: center;
+}
+
+.left-indicator {
+    font-size: 9px;
+    padding: 0px 3px 0px 12px;
+    color: #fff;
+}
+
+.pan-control input {
+    width: 60px;
+    height: 2px;
+}
+
+.right-indicator {
+    font-size: 8px;
+    padding: 0px 10px 0px 3px;
+    color: #fff;
+}
+
+.mute-solo-controls {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    gap: 4px;
+    margin-left: 15px;
+}
+
+.mute-button, .solo-button {
+    padding: 1px 9px;
+    width: 8px;
+    text-align: center;
+    font-size: 10px;
+    border: 1px solid #C3A364;
+    border-radius: 6px;
+    height: min-content;
+    cursor: pointer;
+    background-color: #121212;
+    color: #C3A364;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    flex-wrap: nowrap;
+}
+
+.mute-button.active, .solo-button.active {
+    background-color: #C3A364;
+    color: #121212;
+}
+
+.volume-control {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}
+
+.volume-control input {
+    margin-left: 12px;
+    margin-top: 1px;
+    height: 2px;
+    width: 75%;
+}
+
+/* Input styling */
+
+.slider {
+    -webkit-appearance: none;
+    appearance: none;
+    outline: none;
+}
+
+.volume-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    background: linear-gradient(to right, #c5a46d 100%, #ffffff 0%);
+    outline: none;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 6px; 
+    height: 14px; 
+    border: 1px solid rgba(255, 255, 255, 0.322);
+    border-radius: 20%;
+    background-color: #c5a46d;
+    cursor: pointer;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    width: 14px; 
+    height: 14px;
+    border-radius: 50%;
+    background-color: #c5a46d;
+    cursor: pointer;
+    box-shadow: 0 0 2px #000;
+}
+
+.slider::-moz-range-thumb {
+    width: 14px; 
+    height: 14px;
+    background-color: #c5a46d;
+    cursor: pointer;
+    box-shadow: 0 0 2px #000;
+}
+
+
+@media (max-width: 768px) {
+    main{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #faixas{
+        display: none;
+    }
+    #track-controls{
+        width: 85%;
+    }
+
+    .track-controls{
+        width: 100%;
+        background-color: #191919;
+        background-image: none;
+    }
+
+    .pan-control {
+        width: 90px;
+        height: 20px;
+        display: flex;
+        flex-direction: row;
+    }
+
+    .mute-solo-controls {
+        display: flex;
+        justify-content: start;
+        align-items: center;
+        gap: 4px;
+        margin-left: 15px;
+    }
+
+}

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faixas Separadas</title>
+    <link rel="stylesheet" href="https://unpkg.com/waveform-playlist@4.2.2/styles/playlist.css">
+    <link rel="stylesheet" href="../style/icons.css">
+    <link rel="stylesheet" href="../style/audios.css">
+    <link rel="stylesheet" href="../style/resultados.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+</head>
+<body>
+    <header>
+        <a onclick="goBackAndClose()">
+            <i class="gg-chevron-left"></i>
+            <h1>HarmonyTracks</h1>
+        </a>
+        <button class="baixar" onclick="capturarEstadoFaixas()">Exportar</button>
+    </header>
+    <main>
+        <div id="track-controls">
+            <div style="color: #C3A364;" id="filename"></div>
+        </div>
+        <div id="faixas">
+            <div id="playlist"></div>
+            <div class="checkAlign">
+                <input type="checkbox" name="auto" id="auto">
+                <label style="color: white;" for="auto">Seguir</label>
+            </div>
+        </div>
+    </main>
+
+    <div class="controls">
+        <div>
+            <button class="vol material-symbols-outlined">volume_up</button>
+            <input type="range" id="master-volume" min="0" max="100" value="100" title="Volume">
+            <button class="voltar material-symbols-outlined">skip_previous</button>
+            <button class="playPause material-symbols-outlined">play_arrow</button>
+            <button class="avançar material-symbols-outlined">skip_next</button>
+        </div>
+        <input type="range" id="seek-range" min="0.01" max="100" step="0.1" value="0.01">
+    </div>
+
+    <script src="https://unpkg.com/waveform-playlist@4.2.2/build/waveform-playlist.var.min.js"></script>
+    <script>
+        function goBackAndClose() {
+            window.history.back();
+            window.close();
+        }
+    
+        async function carregarFaixas() {
+            const audioTracks = [
+                { src: './teste/bass.mp3', name: 'Audio 1' },
+                { src: './teste/drums.mp3', name: 'Audio 2' },
+                { src: './teste/guitar.mp3', name: 'Audio 1' },
+                { src: './teste/vocals.mp3', name: 'Audio 2' },
+                { src: './teste/piano.mp3', name: 'Audio 1' },
+                { src: './teste/other.mp3', name: 'Audio 2' },
+            ];
+    
+            document.getElementById('filename').textContent = "Faixas Locais";
+    
+            const audioData = audioTracks.map(track => ({
+                src: track.src,
+                name: track.name
+            }));
+    
+            var playlist = WaveformPlaylist.init({
+                container: document.getElementById("playlist"),
+                controls: { show: false },
+                zoomLevels: [500, 1000, 3000, 4000],
+                waveHeight: 82,
+                state: "cursor",
+                isAutomaticScroll: false,
+                waveStyle: 'bars',
+                seekStyle: "line",
+                timescale: true,
+                samplesPerPixel: 3000,
+                barWidth: 3,
+                barGap: 1,
+            });
+    
+            playlist.load(audioData).then(function() {
+                var ee = playlist.getEventEmitter();
+                var seekRange = document.getElementById('seek-range');
+                let playPause = document.querySelector('.playPause');
+                let isPlaying = false;
+    
+                function togglePlayPause() {
+                    if (isPlaying) {
+                        ee.emit("pause");
+                        playPause.innerHTML = "play_arrow";
+                    } else {
+                        ee.emit("play");
+                        playPause.innerHTML = "pause";
+                    }
+                    isPlaying = !isPlaying;
+                }
+    
+                playPause.addEventListener('click', togglePlayPause);
+    
+                document.addEventListener('keydown', function(event) {
+                    if (event.code === 'Space') {
+                        event.preventDefault();
+                        togglePlayPause();
+                    }
+                });
+    
+                seekRange.addEventListener('input', function(event) {
+                    var seekPercentage = parseFloat(event.target.value);
+                    var duration = getPlaylistDuration();
+                    var seekTime = (seekPercentage / 100) * duration;
+                    ee.emit("select", seekTime, seekTime);
+                });
+    
+                ee.on('timeupdate', function(time) {
+                    var duration = getPlaylistDuration();
+                    var percentage = (time / duration) * 100;
+                    seekRange.value = percentage;
+                });
+    
+                function getPlaylistDuration() {
+                    return playlist.tracks.reduce(function(max, track) {
+                        return Math.max(max, track.getEndTime());
+                    }, 0);
+                }
+    
+                audioData.forEach(function(track, index) {
+                    var trackControls = document.createElement('div');
+                    trackControls.className = 'track-controls';
+                    trackControls.innerHTML = `
+                        <div class="section section-top">
+                            <div class="control-name">
+                                <p class="instrument-name">${track.name}</p>
+                            </div>
+                            <div class="icon-container">
+                                <span class="material-symbols-outlined">more_horiz</span>
+                            </div>
+                        </div>
+                        <div class="section section-middle">
+                            <div class="pan-control">
+                                <div class="left-indicator">L</div>
+                                <input type="range" min="-1" max="1" value="0" step="0.5" data-track="${index}" class="slider pan-slider">
+                                <div class="right-indicator">R</div>
+                            </div>
+                            <div class="mute-solo-controls">
+                                <button class="mute-button" data-track="${index}">M</button>
+                                <button class="solo-button" data-track="${index}">S</button>
+                            </div>
+                        </div>
+                        <div class="section section-bottom">
+                            <div class="volume-control">
+                                <input type="range" data-track="${index}" min="0" max="100" value="100" class="volume-slider slider">
+                                <span class="vol-value" style="color: #fff; margin-left: 9.5px; font-size: 7.5px;">100%</span>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('track-controls').appendChild(trackControls);
+    
+                    const panSlider = trackControls.querySelector('.pan-slider');
+                    const volumeSlider = trackControls.querySelector('.volume-slider');
+                    const volValue = trackControls.querySelector('.vol-value');
+                    const muteButton = trackControls.querySelector('.mute-button');
+                    const soloButton = trackControls.querySelector('.solo-button');
+    
+                    panSlider.addEventListener('input', (event) => {
+                        const value = event.target.value;
+                        const panIndicators = trackControls.querySelectorAll('.pan-control > div');
+                        if (value > 0) {
+                            panIndicators[1].style.color = "#c5a46d";
+                        } else if (value < 0) {
+                            panIndicators[0].style.color = "#c5a46d";
+                        } else {
+                            panIndicators[1].style.color = "#fff";
+                            panIndicators[0].style.color = "#fff";
+                        }
+                    });
+    
+                    volumeSlider.addEventListener('input', (event) => {
+                        const value = event.target.value;
+                        volumeSlider.style.background = `linear-gradient(to right, #c5a46d ${value}%, #fff ${value}%)`;
+                        volValue.textContent = `${value}%`;
+                    });
+    
+                    muteButton.addEventListener('click', () => {
+                        muteButton.classList.toggle('active');
+                        const trackIndex = muteButton.getAttribute('data-track');
+                        ee.emit('mute', playlist.tracks[trackIndex]);
+                    });
+    
+                    soloButton.addEventListener('click', () => {
+                        soloButton.classList.toggle('active');
+                        const trackIndex = soloButton.getAttribute('data-track');
+                        ee.emit('solo', playlist.tracks[trackIndex]);
+                    });
+                    
+                });
+    
+                document.getElementById('master-volume').addEventListener('input', function() {
+                    var volume = parseFloat(this.value);
+                    ee.emit('mastervolumechange', volume);
+                });
+    
+                document.getElementById('auto').addEventListener('change', function() {
+                    ee.emit("automaticscroll", this.checked);
+                });
+    
+                document.querySelectorAll('.volume-slider').forEach(function(inp) {
+                    inp.addEventListener('input', function() {
+                        var trackIndex = this.getAttribute('data-track');
+                        var volume = parseFloat(this.value);
+                        ee.emit('volumechange', volume, playlist.tracks[trackIndex]);
+                    });
+                });
+    
+                document.querySelectorAll('.pan-slider').forEach(function(inp) {
+                    inp.addEventListener('input', function() {
+                        var trackIndex = this.getAttribute('data-track');
+                        var pan = parseFloat(this.value);
+                        ee.emit('stereopan', pan, playlist.tracks[trackIndex]);
+                    });
+                });
+
+                document.querySelectorAll('.icon-container').forEach(icon => {
+                    icon.addEventListener('click', function(event) {
+                        event.stopPropagation(); // Impede o clique de fechar o menu imediatamente
+                    
+                        // Remove qualquer menu existente para recriá-lo
+                        let existingMenu = document.querySelector('.menu-flutuante');
+                        if (existingMenu) {
+                            existingMenu.remove();
+                        }
+                        
+                        // Cria o menu e adiciona ao DOM
+                        let menu = document.createElement('div');
+                        menu.className = 'menu-flutuante';
+                        menu.innerHTML = `
+                            <div class="opcao opcbaixar">Baixar</div>
+                            <div class="opcao opcmidi">Converter para midi</div>
+                            <div class="opcao opcpartitura off">abrir partitura</div>
+                        `;
+                        document.body.appendChild(menu);
+                        
+                        // Define a posição do menu ao lado do ícone clicado
+                        const rect = icon.getBoundingClientRect();
+                        menu.style.top = `${rect.top + window.scrollY}px`;
+                        menu.style.left = `${rect.right + 10}px`;
+                        menu.style.display = 'block';
+
+                        // Adiciona eventos às opções do menu
+                        menu.querySelectorAll('.opcao').forEach(opcao => {
+                            opcao.addEventListener('click', function() {
+                                alert(`Você clicou em: ${this.textContent}`);
+                            });
+                        });
+                    });
+                });
+
+                // Fecha o menu quando clicar fora dele
+                document.addEventListener('click', function(event) {
+                    const menu = document.querySelector('.menu-flutuante');
+                    if (menu && !menu.contains(event.target) && !event.target.classList.contains('icon-container')) {
+                        menu.remove();
+                    }
+                });
+            });
+        }
+    
+        carregarFaixas();
+        function capturarEstadoFaixas() {
+                    const estadosFaixas = [];
+                    const faixas = document.querySelectorAll('.track-controls'); // Seleciona todos os controles de faixa
+                    
+                    faixas.forEach((faixa, index) => {
+                        // Obtendo o volume
+                        const volumeSlider = faixa.querySelector('.volume-slider');
+                        const volume = volumeSlider ? parseFloat(volumeSlider.value) : 0;
+
+                        // Verificando se a faixa está mutada
+                        const muteButton = faixa.querySelector('.mute-button');
+                        const isMute = muteButton ? muteButton.classList.contains('active') : false;
+
+                        // Verificando se a faixa está em solo
+                        const soloButton = faixa.querySelector('.solo-button');
+                        const isSolo = soloButton ? soloButton.classList.contains('active') : false;
+
+                        // Adiciona as informações de cada faixa a um array de objetos
+                        estadosFaixas.push({
+                            faixaIndex: index,
+                            volume: isMute ? 0 : volume, // volume é 0 se estiver mutada
+                            isMute: isMute,
+                            isSolo: isSolo
+                        });
+                    });
+
+                    // Filtra as faixas com base nas condições de solo e mute e exibe no console
+                    const faixasFiltradas = estadosFaixas.filter(faixa => !faixa.isMute || faixa.isSolo);
+                    console.log("Estado das Faixas:", faixasFiltradas);
+                }
+
+                
+    </script>
+    
+    
+</body>
+</html>

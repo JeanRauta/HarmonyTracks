@@ -22,4 +22,9 @@ source /home/eu/miniconda3/etc/profile.d/conda.sh
 conda activate basic
 gnome-terminal -- bash -c "cd /home/eu/Documentos/HarmonyTracks/APIs/midi/basic-pitch && gunicorn -c gunicorn_config.py app:app; exec bash"
 
+echo "Iniciando o servidor de exportação..."
+source /home/eu/miniconda3/etc/profile.d/conda.sh
+conda activate export
+gnome-terminal -- bash -c "cd /home/eu/Documentos/HarmonyTracks/APIs/exportar && gunicorn -c gunicorn_config.py app:app; exec bash"
+
 echo "Todos os servidores foram iniciados."

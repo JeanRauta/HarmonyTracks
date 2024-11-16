@@ -12,6 +12,7 @@ header {
     display: flex;
     align-items: center;
     height: 60px;
+    justify-content: space-between;
 }
 header > a {
     margin: 10px 30px;
@@ -24,12 +25,30 @@ header > a > h1 {
     color: #C3A364;
     font-size: large;
 }
+
+.baixar{
+    padding: 3px 10px;
+    text-align: center;
+    font-size: 18px;
+    border: 1px solid #C3A364;
+    border-radius: 6px;
+    height: min-content;
+    cursor: pointer;
+    background-color: #121212;
+    color: #C3A364;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    flex-wrap: nowrap;
+    margin: 10px 65px;
+}
+
 main {
     margin: auto;
     width: 95vw;
     display: flex;
     align-items: center;
-    background-color: #1D1D1D;
     height: 550px;
     padding: 12px;
     transform: scale(102%);
@@ -283,4 +302,56 @@ input {
 
 .playlist .playlist-tracks {
     background: #27272754;
+}
+
+.menu-flutuante {
+    position: absolute;
+    display: none;
+    background-color: #333;
+    color: white;
+    border-radius: 4px;
+    padding: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+}
+
+.menu-flutuante .opcao {
+    padding: 4px 8px;
+    cursor: pointer;
+}
+
+
+.menu-flutuante .opcao:hover {
+    background-color: #444;
+}
+
+.menu-dropdown {
+    position: absolute;
+    top: 60px; /* Ajuste a posição conforme necessário */
+    right: 10px;
+    width: 300px;
+    display: none;
+    background-color: #333;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 1000;
+}
+
+.menu-dropdown div {
+    padding: 8px 16px;
+    color: white;
+    cursor: pointer;
+}
+
+.menu-dropdown p{
+    padding: 8px 16px;
+    color: white;
+}
+
+.menu-dropdown div:hover {
+    background-color: #444;
+}
+
+header {
+    position: relative; 
 }
