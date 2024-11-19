@@ -17,6 +17,17 @@
             <h1>HarmonyTracks</h1>
         </a>
         <button class="baixar" onclick="capturarEstadoFaixas()">Exportar</button>
+        <div id="menuDropdown" class="menu-dropdown">
+            <div onclick="baixarFaixasSeparadas()">Baixar Faixas Separadas</div>
+            <div onclick="baixarPlaybackVocal()">Baixar Playback Vocal</div>
+            <p>Backingtracks</p>
+            <div style="padding-left: 20px;" onclick="baixarBackintrack('guitar')">backingtrack Guitar</div>
+            <div style="padding-left: 20px;" onclick="baixarBackintrack('piano')">backingtrack Piano</div>
+            <div style="padding-left: 20px;" onclick="baixarBackintrack('drum')">backingtrack Drum</div>
+            <div style="padding-left: 20px;" onclick="baixarBackintrack('bass')">backingtrack Bass</div>
+            <div style="padding-left: 20px;" onclick="baixarBackintrack('other')">backingtrack Other</div>
+            <div onclick="baixarMix()">Baixar Mix</div>
+        </div>
     </header>
     <main>
         <div id="track-controls">
@@ -299,7 +310,101 @@
                     console.log("Estado das Faixas:", faixasFiltradas);
                 }
 
-                
+function toggleMenu() {
+    const menu = document.getElementById('menuDropdown');
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+}
+
+function baixarFaixasSeparadas() {
+    enviarDadosParaApi("baixarFaixasSeparadas");
+}
+
+function baixarPlaybackVocal() {
+    enviarDadosParaApi("baixarPlaybackVocal");
+}
+
+function baixarBackintrack(tipo) {
+    enviarDadosParaApi(`baixarBackintrack${tipo}`);
+}
+
+function baixarMix() {
+    enviarDadosParaApi("baixarMix");
+}
+
+async function enviarDadosParaApi(extraString) {
+    const estadosFaixas = [];
+    const faixas = document.querySelectorAll('.track-controls');
+
+    faixas.forEach((faixa, index) => {
+        const volumeSlider = faixa.querySelector('.volume-slider');
+        const volume = volumeSlider ? parseFloat(volumeSlider.value) : 100;
+
+        const muteButton = faixa.querySelector('.mute-button');
+        const isMute = muteButton ? muteButton.classList.contains('active') : false;
+
+        const soloButton = faixa.querySelector('.solo-button');
+        const isSolo = soloButton ? soloButton.classList.contains('active') : false;
+
+        const audioSrc = audioTags[index].src;
+
+        estadosFaixas.push({
+            audioSrc: audioSrc,
+            volume: isMute ? 0 : volume,
+            isMute: isMute,
+            isSolo: isSolo
+        });
+    });
+
+    const payload = {
+        "Estado das Faixas": estadosFaixas,
+        "extraString": extraString
+    };
+
+    try {
+        const token = sessionStorage.getItem('token');
+        const response = await fetch("http://localhost:5000/api/upload", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+    const blob = await response.blob();
+    const contentDisposition = response.headers.get("Content-Disposition");
+    const filename = contentDisposition 
+        ? contentDisposition.split("filename=")[1]?.replace(/"/g, '') 
+        : "download";
+
+    const downloadUrl = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = downloadUrl;
+    a.download = filename; 
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(downloadUrl);
+} else {
+    const errorData = await response.json();
+    console.error("Erro ao baixar arquivo:", errorData.error);
+    alert("Erro ao realizar o download: " + errorData.error);
+}
+
+    } catch (error) {
+        console.error("Erro na conexão com a API:", error);
+        alert("Erro ao conectar-se à API.");
+    }
+}
+
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('menuDropdown');
+            if (!menu.contains(event.target) && event.target !== document.querySelector('.baixar')) {
+                menu.style.display = 'none';
+            }
+        });
     </script>
     
     

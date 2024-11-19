@@ -105,7 +105,7 @@
             const response = await fetch('http://localhost:5000/api/iniciar-sessao', {
                 method: 'POST',
                 headers: headers
-            });
+            }); 
             if (!response.ok) {
                 alert('Erro ao iniciar sessão. Tente novamente.');
                 return;

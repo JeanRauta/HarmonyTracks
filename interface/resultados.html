@@ -358,10 +358,12 @@ async function enviarDadosParaApi(extraString) {
     };
 
     try {
-        const response = await fetch("http://localhost:5004/upload", {
+        const token = sessionStorage.getItem('token');
+        const response = await fetch("http://localhost:5000/api/upload", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(payload)
         });
